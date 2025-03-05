@@ -10,7 +10,7 @@
 
 
 
-BankStatement::BankStatement(){
+BankStatement::BankStatement(std::string fname){
 
 }
 

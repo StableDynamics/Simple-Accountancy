@@ -24,7 +24,7 @@ class BankStatement
 {
 
 public:
-	BankStatement();
+	BankStatement(std::string fname);
 	virtual ~BankStatement();
 	void printSummary();
 

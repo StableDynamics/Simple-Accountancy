@@ -2,19 +2,21 @@
 //
 
 #include <iostream>
+#include <string>
+#include "BankStatement.h"
 
-int main()
+int main(int argc, char* argv[])
 {
+    // Program takes in the filename at launch in the format of "filename.exe" "path\filename.csv"	
+    // TO DO Check that it has the right number of launch inputs
+    // TO DO Check that it is a csv file
+    for (size_t i = 1; i < argc; i++)
+    {
+        std::string fname{ argv[i] };
+
+        // Create AccountData class object for supplied file
+        BankStatement statement(fname);
+    }
+    
     std::cout << "Hello World!\n";
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
