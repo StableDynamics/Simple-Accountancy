@@ -11,6 +11,8 @@
 enum ItemType
 {
 	Other,
+	Salary,
+	Dividend,
 	Rent,
 	Bills,
 	Groceries,

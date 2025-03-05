@@ -13,8 +13,12 @@
 #include <valarray>
 #include <fstream>
 #include <sstream>
+#include <iostream>
+#include <stdexcept>
 
+#include "HelpfulFunctions.h"
 #include "LineValue.h"
+#include "BankName.h"
 
 /**
  * This is the class that holds the processed data for the bank statement from the
@@ -29,7 +33,7 @@ public:
 	void printSummary();
 
 private:
-	std::string bankName;
+	BankName bankName;
 	std::vector<LineValue> expenses;
 	std::string accountingPeriod;
 	double avgIncome;

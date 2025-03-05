@@ -7,16 +7,31 @@
 
 int main(int argc, char* argv[])
 {
-    // Program takes in the filename at launch in the format of "filename.exe" "path\filename.csv"	
-    // TO DO Check that it has the right number of launch inputs
-    // TO DO Check that it is a csv file
+    // Program takes in the filename at launch in the format of "path\filename.csv"
+    // Error check inputs
+    if (argc < 2)
+    {
+        std::cerr << "Program has not been supplied enough arguments. Have you given it the location"
+            " of a file?" << std::endl;
+    }
+
+    // Loop through all the files that were supplied
     for (size_t i = 1; i < argc; i++)
     {
         std::string fname{ argv[i] };
 
         // Create AccountData class object for supplied file
-        BankStatement statement(fname);
+        try
+        {
+            BankStatement statement(fname);
+
+            std::cout << "Created class from " << fname << "\n\n";
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+            return -1;
+        }
     }
-    
-    std::cout << "Hello World!\n";
+	return 0;
 }

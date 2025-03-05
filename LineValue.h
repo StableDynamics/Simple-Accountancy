@@ -8,9 +8,12 @@
 #if !defined(LINEVALUE)
 #define LINEVALUE
 
+#include <string>
+
 #include "Month.h"
 #include "IncomeOrExpense.h"
 #include "ItemType.h"
+#include "Currency.h"
 
 /**
  * This struct contains the data from each line of the csv
@@ -18,10 +21,11 @@
 struct LineValue
 {
 
-private:
 	int year;
 	Month month;
 	int day;
+	std::string description;
+	Currency currency;
 	double paidIn;
 	double paidOut;
 	double balance;
