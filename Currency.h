@@ -45,11 +45,11 @@ namespace Currency
 	static_assert(currencySymbols.size() == maxCurrencies, "Missing Currency symbol");
 
 	// Common get functions
-	constexpr std::array<std::string_view, maxCurrencies> getEnumStrings3Len()
+	constexpr const std::array<std::string_view, maxCurrencies>& getEnumStrings3Len()
 	{
 		return currencyStrings;
 	}
-	constexpr std::array<std::string_view, maxCurrencies> getEnumStringsOther()
+	constexpr const std::array<std::string_view, maxCurrencies>& getEnumStringsOther()
 	{
 		return currencySymbols;
 	}
