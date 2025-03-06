@@ -50,22 +50,6 @@ namespace Month
 		"Nov",
 		"Dec"
 	};
-	/*constexpr std::array monthStrings3Len =
-	{
-		"Unused"sv,
-		"Jan"sv,
-		"Feb"sv,
-		"Mar"sv,
-		"Apr"sv,
-		"May"sv,
-		"Jun"sv,
-		"Jul"sv,
-		"Aug"sv,
-		"Sep"sv,
-		"Oct"sv,
-		"Nov"sv,
-		"Dec"sv
-	};*/
 	
 	const std::vector<std::string_view> monthStringsOther =
 	{
@@ -83,20 +67,6 @@ namespace Month
 		"November",
 		"December"
 	};
-
-	//Make sure we've defined all enums
-	//static_assert(monthStrings3Len.size() == maxMonths, "Missing 3 Length Month string");
-	//static_assert(monthStringsOther.size() == maxMonths, "Missing Other Month string");
-
-	// Common get functions
-	/*const std::vector<std::string_view>& getEnumStrings3Len()
-	{
-		return monthStrings3Len;
-	}
-	const std::vector<std::string_view>& getEnumStringsOther()
-	{
-		return monthStringsOther;
-	}*/
 }
 
 

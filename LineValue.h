@@ -29,8 +29,8 @@ struct LineValue
 	double paidIn;
 	double paidOut;
 	double balance;
-	IncomeOrExpense incomeOrExpense;
-	ItemType itemType;
+	IncomeOrExpense::IncomeOrExpense incomeOrExpense;
+	ItemType::ItemType itemType;
 
 };
 #endif // !defined(LINEVALUE)

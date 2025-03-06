@@ -68,7 +68,7 @@ BankStatement::BankStatement(std::string fname) : bankName{ BankName::Nationwide
 	// Process content into LineValue objects
 	switch (bankName)
 	{
-	case Nationwide_UK:
+	case BankName::Nationwide_UK:
 		// Data starts on line 6 from Nationwide csvs
 		startLine = 5;
 
@@ -84,8 +84,7 @@ BankStatement::BankStatement(std::string fname) : bankName{ BankName::Nationwide
 		for (size_t i = startLine; i < content.size(); i++)
 		{
 			lineValue.day = std::stoi(content[i][0].substr(1,2));
-			//lineValue.month = monthFromString(content[i][0].substr(4, 3), i, fname);
-			lineValue.month = enumFromString<Month::Month>(content[i][0].substr(4, 3));
+			lineValue.month = enumFromString<Month::Month>(content[i][0].substr(4, 3), i, fname);
 			lineValue.year = std::stoi(content[i][0].substr(8, 4));
 			lineValue.description = content[i][2].substr(1, content[i][2].size() - 2);
 
@@ -95,14 +94,14 @@ BankStatement::BankStatement(std::string fname) : bankName{ BankName::Nationwide
 			{
 				lineValue.paidOut = 0.0;
 				lineValue.paidIn = std::stod(content[i][4].substr(2, content[i][4].size() - 3));
-				lineValue.currency = currencyFromString(content[i][4].substr(1, 1));
+				lineValue.currency = enumFromString<Currency::Currency>(content[i][4].substr(1, 1), i, fname);
 				lineValue.incomeOrExpense = IncomeOrExpense::Income;
 			}
 			else
 			{
 				lineValue.paidOut = std::stod(content[i][3].substr(2, content[i][3].size() - 3));
 				lineValue.paidIn = 0.0;
-				lineValue.currency = currencyFromString(content[i][3].substr(1, 1));
+				lineValue.currency = enumFromString<Currency::Currency>(content[i][3].substr(1, 1), i, fname);
 				lineValue.incomeOrExpense = IncomeOrExpense::Expense;
 			}
 
@@ -120,11 +119,11 @@ BankStatement::BankStatement(std::string fname) : bankName{ BankName::Nationwide
 		}
 		break;
 
-	case Natwest_UK:
+	case BankName::Natwest_UK:
 		break;
-	case Halifax_UK:
+	case BankName::Halifax_UK:
 		break;
-	case Tide_UK:
+	case BankName::Tide_UK:
 		break;
 	default:
 		break;

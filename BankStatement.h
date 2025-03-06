@@ -34,7 +34,7 @@ public:
 	void printSummary();
 
 private:
-	BankName bankName;
+	BankName::BankName bankName;
 	std::vector<LineValue> expenses;
 	std::string accountingPeriod;
 	double avgIncome;

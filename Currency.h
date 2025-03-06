@@ -8,7 +8,7 @@
 #if !defined(CURRENCY)
 #define CURRENCY
 
-#include <array>
+#include <vector>
 #include <string_view>
 
 /**
@@ -24,35 +24,19 @@ namespace Currency
 		maxCurrencies
 	};
 
-	// Using sc suffix so std::array will infer that it is a string_view
-	using namespace std::string_view_literals;
-	constexpr std::array currencyStrings =
+	const std::vector<std::string_view> currencyStrings3Len =
 	{
-		"GBP"sv,
-		"EUR"sv,
-		"USD"sv
+		"GBP",
+		"EUR",
+		"USD"
 	};
 
-	constexpr std::array currencySymbols =
+	const std::vector<std::string_view> currencyStringsOther =
 	{
-		"£"sv,
-		"€"sv,
-		"$"sv
+		"£",
+		"€",
+		"$"
 	};
-
-	//Make sure we've defined all enums
-	static_assert(currencyStrings.size() == maxCurrencies, "Missing Currency string");
-	static_assert(currencySymbols.size() == maxCurrencies, "Missing Currency symbol");
-
-	// Common get functions
-	constexpr const std::array<std::string_view, maxCurrencies>& getEnumStrings3Len()
-	{
-		return currencyStrings;
-	}
-	constexpr const std::array<std::string_view, maxCurrencies>& getEnumStringsOther()
-	{
-		return currencySymbols;
-	}
 }
 
 #endif // !defined(CURRENCY)

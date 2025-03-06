@@ -8,12 +8,38 @@
 #if !defined(BANKNAME)
 #define BANKNAME
 
+#include <vector>
+#include <string_view>
 
-enum BankName
+/*
+ * What bank is the statement from?
+ */
+namespace BankName
 {
-	Nationwide_UK,
-	Natwest_UK,
-	Halifax_UK,
-	Tide_UK
-};
+	enum BankName
+	{
+		Nationwide_UK,
+		Natwest_UK,
+		Halifax_UK,
+		Tide_UK,
+		maxBanks
+	};
+
+	const std::vector<std::string_view> bankNameStrings3Len =
+	{
+		"Nat",
+		"Nat",
+		"Hal",
+		"Tid"
+	};
+
+	const std::vector<std::string_view> bankNameStringsOther =
+	{
+		"Nationwide UK",
+		"Natwest UK",
+		"Halifax UK",
+		"Tide UK"
+	};
+}
+
 #endif // !defined(BANKNAME)
