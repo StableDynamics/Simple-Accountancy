@@ -19,6 +19,7 @@
 #include "HelpfulFunctions.h"
 #include "LineValue.h"
 #include "BankName.h"
+#include "Month.h"
 
 /**
  * This is the class that holds the processed data for the bank statement from the

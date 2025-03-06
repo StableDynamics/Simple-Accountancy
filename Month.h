@@ -36,25 +36,8 @@ namespace Month
 
 	// Using sc suffix so std::array will infer that it is a string_view
 	using namespace std::string_view_literals;
-	constexpr std::array monthStringsLong =
-		{
-		"Unused"sv,
-		"January"sv,
-		"February"sv,
-		"March"sv,
-		"April"sv,
-		"May"sv,
-		"June"sv,
-		"July"sv,
-		"August"sv,
-		"September"sv,
-		"October"sv,
-		"November"sv,
-		"December"sv
-		};
-
-	constexpr std::array monthStringsShort =
-		{
+	constexpr std::array monthStrings3Len =
+	{
 		"Unused"sv,
 		"Jan"sv,
 		"Feb"sv,
@@ -68,11 +51,38 @@ namespace Month
 		"Oct"sv,
 		"Nov"sv,
 		"Dec"sv
-		};
+	};
+	
+	constexpr std::array monthStringsOther =
+	{
+		"Unused"sv,
+		"January"sv,
+		"February"sv,
+		"March"sv,
+		"April"sv,
+		"May"sv,
+		"June"sv,
+		"July"sv,
+		"August"sv,
+		"September"sv,
+		"October"sv,
+		"November"sv,
+		"December"sv
+	};
 
 	//Make sure we've defined all enums
-	static_assert(monthStringsLong.size() == maxMonths, "Missing long Month string");
-	static_assert(monthStringsShort.size() == maxMonths, "Missing short Month string");
+	static_assert(monthStrings3Len.size() == maxMonths, "Missing 3 Length Month string");
+	static_assert(monthStringsOther.size() == maxMonths, "Missing Other Month string");
+
+	// Common get functions
+	constexpr const std::array<std::string_view, maxMonths> getEnumStrings3Len()
+	{
+		return monthStrings3Len;
+	}
+	constexpr const std::array<std::string_view, maxMonths> getEnumStringsOther()
+	{
+		return monthStringsOther;
+	}
 }
 
 

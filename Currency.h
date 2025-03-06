@@ -43,6 +43,16 @@ namespace Currency
 	//Make sure we've defined all enums
 	static_assert(currencyStrings.size() == maxCurrencies, "Missing Currency string");
 	static_assert(currencySymbols.size() == maxCurrencies, "Missing Currency symbol");
+
+	// Common get functions
+	constexpr std::array<std::string_view, maxCurrencies> getEnumStrings3Len()
+	{
+		return currencyStrings;
+	}
+	constexpr std::array<std::string_view, maxCurrencies> getEnumStringsOther()
+	{
+		return currencySymbols;
+	}
 }
 
 #endif // !defined(CURRENCY)

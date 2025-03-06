@@ -85,6 +85,7 @@ BankStatement::BankStatement(std::string fname) : bankName{ BankName::Nationwide
 		{
 			lineValue.day = std::stoi(content[i][0].substr(1,2));
 			lineValue.month = monthFromString(content[i][0].substr(4, 3), i, fname);
+			lineValue.month = enumFromString<Month::Month>(content[i][0].substr(4, 3));
 			lineValue.year = std::stoi(content[i][0].substr(8, 4));
 			lineValue.description = content[i][2].substr(1, content[i][2].size() - 2);
 

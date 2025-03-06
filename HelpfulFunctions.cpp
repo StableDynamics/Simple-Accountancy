@@ -8,9 +8,9 @@ Month::Month monthFromString(const std::string& monthString)
 	// Iterate through list of months and return the correct one based on search string size
 	if (monthString.size() == 3)
 	{
-		for (size_t i = 0; i < Month::monthStringsShort.size(); i++)
+		for (size_t i = 0; i < Month::monthStrings3Len.size(); i++)
 		{
-			if (monthString == Month::monthStringsShort[i])
+			if (monthString == Month::monthStrings3Len[i])
 			{
 				return static_cast<Month::Month>(i);
 			}
@@ -18,9 +18,9 @@ Month::Month monthFromString(const std::string& monthString)
 	}
 	else if (monthString.size() > 3)
 	{
-		for (size_t i = 0; i < Month::monthStringsLong.size(); i++)
+		for (size_t i = 0; i < Month::monthStringsOther.size(); i++)
 		{
-			if (monthString == Month::monthStringsLong[i])
+			if (monthString == Month::monthStringsOther[i])
 			{
 				return static_cast<Month::Month>(i);
 			}
