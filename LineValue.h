@@ -22,10 +22,10 @@ struct LineValue
 {
 
 	int year;
-	Month month;
+	Month::Month month;
 	int day;
 	std::string description;
-	Currency currency;
+	Currency::Currency currency;
 	double paidIn;
 	double paidOut;
 	double balance;

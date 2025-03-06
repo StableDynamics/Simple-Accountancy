@@ -1,78 +1,99 @@
 #include "HelpfulFunctions.h"
 
-
-Month monthFromString(std::string monthString)
+/**
+ * Bring out the month enum from a short month string
+ */
+Month::Month monthFromString(const std::string& monthString)
 {
-	if (monthString == "Jan")
+	// Iterate through list of months and return the correct one based on search string size
+	if (monthString.size() == 3)
 	{
-		return Month::January;
+		for (size_t i = 0; i < Month::monthStringsShort.size(); i++)
+		{
+			if (monthString == Month::monthStringsShort[i])
+			{
+				return static_cast<Month::Month>(i);
+			}
+		}
 	}
-	else if (monthString == "Feb")
+	else if (monthString.size() > 3)
 	{
-		return Month::February;
+		for (size_t i = 0; i < Month::monthStringsLong.size(); i++)
+		{
+			if (monthString == Month::monthStringsLong[i])
+			{
+				return static_cast<Month::Month>(i);
+			}
+		}
 	}
-	else if (monthString == "Mar")
+	
+
+	// If month is not found - error
+	std::stringstream errMsg;
+	errMsg << "Month name not recognised. Name supplied was: " << monthString << std::endl;
+	std::string err = errMsg.str();
+	throw std::runtime_error(err);
+
+}
+
+Month::Month monthFromString(const std::string& monthString, size_t index)
+{
+	try
 	{
-		return Month::March;
+		return monthFromString(monthString);
 	}
-	else if (monthString == "Apr")
+	catch (const std::exception& e)
 	{
-		return Month::April;
-	}
-	else if (monthString == "May")
-	{
-		return Month::May;
-	}
-	else if (monthString == "Jun")
-	{
-		return Month::June;
-	}
-	else if (monthString == "Jul")
-	{
-		return Month::July;
-	}
-	else if (monthString == "Aug")
-	{
-		return Month::August;
-	}
-	else if (monthString == "Sep")
-	{
-		return Month::September;
-	}
-	else if (monthString == "Oct")
-	{
-		return Month::October;
-	}
-	else if (monthString == "Nov")
-	{
-		return Month::November;
-	}
-	else if (monthString == "Dec")
-	{
-		return Month::December;
-	}
-	else
-	{
-		throw std::runtime_error("Month not recognised");
+		std::stringstream errMsg;
+		errMsg << e.what() << "Index of month in csv file: " << index << std::endl;
+		std::string err = errMsg.str();
+		throw std::runtime_error(err);
 	}
 }
 
-Currency currencyFromString(std::string currencyString)
+Month::Month monthFromString(const std::string& monthString, size_t index, const std::string& fname)
 {
-	if (currencyString == "GBP" || currencyString == "£")
+	try
 	{
-		return Currency::GBP;
+		return monthFromString(monthString, index);
 	}
-	else if (currencyString == "EUR" || currencyString == "€")
+	catch (const std::exception& e)
 	{
-		return Currency::EUR;
+		std::stringstream errMsg;
+		errMsg << e.what() << "File Name: " << fname << std::endl;
+		std::string err = errMsg.str();
+		throw std::runtime_error(err);
 	}
-	else if (currencyString == "USD" || currencyString == "$")
+}
+
+Currency::Currency currencyFromString(const std::string& currencyString)
+{
+	// Iterate through list of months and return the correct one based on search string size
+	if (currencyString.size() == 3)
 	{
-		return Currency::USD;
+		for (size_t i = 0; i < Currency::currencyStrings.size(); i++)
+		{
+			if (currencyString == Currency::currencyStrings[i])
+			{
+				return static_cast<Currency::Currency>(i);
+			}
+		}
 	}
-	else
+	else if (currencyString.size() == 1)
 	{
-		throw std::runtime_error("Currency not recognised");
+		for (size_t i = 0; i < Currency::currencySymbols.size(); i++)
+		{
+			if (currencyString == Currency::currencySymbols[i])
+			{
+				return static_cast<Currency::Currency>(i);
+			}
+		}
 	}
+
+
+	// If currency is not found - error
+	std::stringstream errMsg;
+	errMsg << "Currency name not recognised. Name supplied was: " << currencyString << std::endl;
+	std::string err = errMsg.str();
+	throw std::runtime_error(err);
 }

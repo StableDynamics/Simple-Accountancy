@@ -84,7 +84,7 @@ BankStatement::BankStatement(std::string fname) : bankName{ BankName::Nationwide
 		for (size_t i = startLine; i < content.size(); i++)
 		{
 			lineValue.day = std::stoi(content[i][0].substr(1,2));
-			lineValue.month = monthFromString(content[i][0].substr(4, 3));
+			lineValue.month = monthFromString(content[i][0].substr(4, 3), i, fname);
 			lineValue.year = std::stoi(content[i][0].substr(8, 4));
 			lineValue.description = content[i][2].substr(1, content[i][2].size() - 2);
 
@@ -122,6 +122,8 @@ BankStatement::BankStatement(std::string fname) : bankName{ BankName::Nationwide
 	case Natwest_UK:
 		break;
 	case Halifax_UK:
+		break;
+	case Tide_UK:
 		break;
 	default:
 		break;

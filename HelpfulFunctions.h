@@ -2,14 +2,19 @@
 #define HELPFULFUNCTIONS
 #include <string>
 #include <stdexcept>
+#include <sstream>
 
 #include "Month.h"
 #include "Currency.h"
 
-// string to Enum convertions
-Month monthFromString(std::string monthString);
+// String to Enum convertions
+Month::Month monthFromString(const std::string& monthString);
 
-Currency currencyFromString(std::string currencyString);
+Month::Month monthFromString(const std::string& monthString, size_t index);
+
+Month::Month monthFromString(const std::string& monthString, size_t index, const std::string& fname);
+
+Currency::Currency currencyFromString(const std::string& currencyString);
 
 
 #endif

@@ -14,5 +14,6 @@ enum BankName
 	Nationwide_UK,
 	Natwest_UK,
 	Halifax_UK,
+	Tide_UK
 };
 #endif // !defined(BANKNAME)

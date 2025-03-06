@@ -8,10 +8,41 @@
 #if !defined(CURRENCY)
 #define CURRENCY
 
-enum Currency
+#include <array>
+#include <string_view>
+
+/**
+ * What currency is it?
+ */
+namespace Currency
 {
-	GBP,
-	EUR,
-	USD
-};
+	enum Currency
+	{
+		GBP,
+		EUR,
+		USD,
+		maxCurrencies
+	};
+
+	// Using sc suffix so std::array will infer that it is a string_view
+	using namespace std::string_view_literals;
+	constexpr std::array currencyStrings =
+	{
+		"GBP"sv,
+		"EUR"sv,
+		"USD"sv
+	};
+
+	constexpr std::array currencySymbols =
+	{
+		"£"sv,
+		"€"sv,
+		"$"sv
+	};
+
+	//Make sure we've defined all enums
+	static_assert(currencyStrings.size() == maxCurrencies, "Missing Currency string");
+	static_assert(currencySymbols.size() == maxCurrencies, "Missing Currency symbol");
+}
+
 #endif // !defined(CURRENCY)
