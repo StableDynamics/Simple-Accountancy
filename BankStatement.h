@@ -20,6 +20,10 @@
 #include "LineValue.h"
 #include "BankName.h"
 #include "Month.h"
+#include "Currency.h"
+#include "IncomeOrExpense.h"
+#include "ItemType.h"
+#include "ItemTypeDiscriminator.h"
 
 /**
  * This is the class that holds the processed data for the bank statement from the
@@ -32,6 +36,7 @@ public:
 	BankStatement(std::string fname);
 	virtual ~BankStatement();
 	void printSummary();
+	// Maybe add copy constructor and assignment operator here?
 
 private:
 	BankName::BankName bankName;

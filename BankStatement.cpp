@@ -7,9 +7,6 @@
 
 #include "BankStatement.h"
 
-
-
-
 BankStatement::BankStatement(std::string fname) : bankName{ BankName::Nationwide_UK }, accountingPeriod{ "" }, avgIncome{ 0 }, avgExpenditure{ 0 }
 {
 	// Data vectors for the raw data from the file
@@ -19,7 +16,7 @@ BankStatement::BankStatement(std::string fname) : bankName{ BankName::Nationwide
 
 	// Blank line value object and associated blank data variables	
 	int startLine{ 0 };
-	LineValue lineValue = { 0, Month::January, 0, "", Currency::GBP, 0, 0, 0, IncomeOrExpense::Expense, ItemType::Bills};
+	LineValue lineValue = { 0, Month::January, 0, "", "", Currency::GBP, 0, 0, 0, IncomeOrExpense::Expense, ItemType::Bills };
 
 	// Open file using fstream for reading into Internal buffer
 	std::fstream file(fname, std::fstream::in);
@@ -87,6 +84,7 @@ BankStatement::BankStatement(std::string fname) : bankName{ BankName::Nationwide
 			lineValue.month = enumFromString<Month::Month>(content[i][0].substr(4, 3), i, fname);
 			lineValue.year = std::stoi(content[i][0].substr(8, 4));
 			lineValue.description = content[i][2].substr(1, content[i][2].size() - 2);
+			lineValue.description_ptr = static_cast<std::string_view>(lineValue.description);
 
 			// Assign Paid in/Paid out
 			// ASSUMPTION: csv file will not have 'information only' entries with no money values
@@ -113,6 +111,7 @@ BankStatement::BankStatement(std::string fname) : bankName{ BankName::Nationwide
 				lineValue.balance = std::stod(content[i][5].substr(2, content[i][5].size() - 3));
 
 			// This is where a discrimiator would sit in order to determine the line item type
+
 
 			// Push lineValue back into the expenses vector
 			expenses.push_back(lineValue);
@@ -145,6 +144,9 @@ void BankStatement::printSummary(){
 
 }
 
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+* Private functions
+*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Determines the period that this accounting period is over based on the dates

@@ -27,19 +27,18 @@ T enumFromString(const std::string& enumString)
 	std::unique_ptr<const std::vector<std::string_view>> enumOtherStrings_ptr;
 	size_t length{ 0 };
 
-	// Setup comparison string_views for the enum types
-	std::string_view month = "enum Month::Month";
-	std::string_view currency = "enum Currency::Currency";
+	// Setup comparison string_views for the current enum type
+	std::string_view enumName = getTypeName<T>();
 	//TODO: Add more enum types here
 
 	// Based on the type of enum, setup data pointers
-	if (getTypeName<T>() == month)
+	if (enumName == static_cast<std::string_view>("enum Month::Month"))
 	{
 		enum3LenStrings_ptr = std::make_unique<const std::vector<std::string_view>>(Month::monthStrings3Len);
 		enumOtherStrings_ptr = std::make_unique<const std::vector<std::string_view>>(Month::monthStringsOther);
 		length = enum3LenStrings_ptr->size();
 	}
-	else if (getTypeName<T>() == currency)
+	else if (enumName == static_cast<std::string_view>("enum Currency::Currency"))
 	{
 		enum3LenStrings_ptr = std::make_unique<const std::vector<std::string_view>>(Currency::currencyStrings3Len);
 		enumOtherStrings_ptr = std::make_unique<const std::vector<std::string_view>>(Currency::currencyStringsOther);
@@ -48,7 +47,7 @@ T enumFromString(const std::string& enumString)
 	else // Throw an exception saying that the enum type is not recognised
 	{
 		std::stringstream errMsg;
-		errMsg << "Enum type not recognised. Type supplied was: " << static_cast<std::string>(getTypeName<T>()) << std::endl;
+		errMsg << "Enum type not recognised. Type supplied was: " << static_cast<std::string>(enumName) << std::endl;
 		std::string err = errMsg.str();
 		throw std::runtime_error(err);
 	}

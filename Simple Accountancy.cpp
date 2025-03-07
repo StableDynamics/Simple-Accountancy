@@ -59,5 +59,6 @@ int main(int argc, char* argv[])
     }
 
 	std::cout << "Finished processing all files\n\n";
+
 	return 0;
 }
