@@ -3,7 +3,7 @@ name: Task Template
 about: This template provides a default setup for a task for someone to do and complete
   akin to a user story as opposed to an issue or bug
 title: 'TASK: '
-labels: ''
+labels: help wanted
 assignees: ''
 
 ---
