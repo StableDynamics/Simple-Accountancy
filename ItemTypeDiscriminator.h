@@ -4,6 +4,7 @@
 #include <string_view>
 
 #include "itemType.h"
+#include "HelpfulFunctions.h"
 
 /*
 * The ItemTypeDiscriminator will work out the type of the bank statement line item be nice if it 

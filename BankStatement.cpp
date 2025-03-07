@@ -111,7 +111,7 @@ BankStatement::BankStatement(std::string fname) : bankName{ BankName::Nationwide
 				lineValue.balance = std::stod(content[i][5].substr(2, content[i][5].size() - 3));
 
 			// This is where a discrimiator would sit in order to determine the line item type
-
+			lineValue.itemType = determineItemType(lineValue.description_ptr);
 
 			// Push lineValue back into the expenses vector
 			expenses.push_back(lineValue);
