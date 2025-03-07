@@ -167,13 +167,13 @@ void BankStatement::makeSureDataIsAscending() {
 	
 	// Check and rearrange as required
 	// ASSUMPTION: Data is in year order, then month order, then day order
-	if (expenses.begin()->year >= expenses.end()->year)
+	if (expenses.begin()->year >= std::prev(expenses.end())->year)
 	{
-		if (expenses.begin()->month >= expenses.end()->month)
+		if (expenses.begin()->month >= std::prev(expenses.end())->month)
 		{
-			if (expenses.begin()->day >= expenses.end()->day)
+			if (expenses.begin()->day >= std::prev(expenses.end())->day)
 			{
-				if (expenses.begin()->day == expenses.end()->day)
+				if (expenses.begin()->day == std::prev(expenses.end())->day)
 				{
 					// Most bank csvs don't have time info so if the statement only contains transactions from the same day assumptions
 					// are made based on the bank

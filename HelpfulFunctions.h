@@ -22,7 +22,7 @@
 * Convert a string to an enum
 */
 template <typename T>
-T enumFromString(const std::string& enumString)
+T enumFromString(const std::string_view enumString)
 {
 	static_assert(std::is_enum_v<T>); // Must be an enum
 	// Setup blank data variables
@@ -103,7 +103,7 @@ T enumFromString(const std::string& enumString)
 }
 
 template <typename T>
-T enumFromString(const std::string& enumString, size_t index)
+T enumFromString(const std::string_view enumString, size_t index)
 {
 	try
 	{
@@ -120,7 +120,7 @@ T enumFromString(const std::string& enumString, size_t index)
 }
 
 template <typename T>
-T enumFromString(const std::string& enumString, size_t index, const std::string& fname)
+T enumFromString(const std::string_view enumString, size_t index, const std::string& fname)
 {
 	try
 	{

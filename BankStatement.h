@@ -16,6 +16,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <algorithm>
+#include <iterator>
 
 #include "HelpfulFunctions.h"
 #include "LineValue.h"
