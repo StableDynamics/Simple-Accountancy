@@ -67,38 +67,34 @@ T enumFromString(const std::string_view enumString)
 	else // Throw an exception saying that the enum type is not recognised
 	{
 		std::stringstream errMsg;
-		errMsg << "Enum type not recognised in enumFromString(const std::string& enumString). Type supplied was: " << static_cast<std::string>(enumName) << std::endl;
+		errMsg << "Enum type not recognised in enumFromString(const std::string& enumString). Type supplied was: " << enumName << std::endl;
 		std::string err = errMsg.str();
 		throw std::runtime_error(err);
 	}
 
+	// Define error message
+	std::stringstream errMsg;
+	errMsg << "Enum name not recognised in enumFromString(const std::string& enumString). Name supplied was: " << enumString << std::endl
+		<< "Enum type being compared was: " << enumName << std::endl;
+	std::string err = errMsg.str();
+
 	// Runthrough data variables to find the correct enum
 	if (enumString.length() == 3)
 	{
-		for (size_t i = 0; i < enum3LenStrings_ptr->size(); i++)
-		{
-			if (enumString == (*enum3LenStrings_ptr)[i])
-			{
-				return static_cast<T>(i);
-			}
-		}
+		const auto found = std::find(enum3LenStrings_ptr->begin(), enum3LenStrings_ptr->end(), enumString);
+		const auto index = std::distance(enum3LenStrings_ptr->begin(), found);
+		if (found == enum3LenStrings_ptr->end()) throw std::runtime_error(err);
+		else return static_cast<T>(index);
 	}
 	else
 	{
-		for (size_t i = 0; i < enumOtherStrings_ptr->size(); i++)
-		{
-			if (enumString == (*enumOtherStrings_ptr)[i])
-			{
-				return static_cast<T>(i);
-			}
-		}
+		const auto found = std::find(enumOtherStrings_ptr->begin(), enumOtherStrings_ptr->end(), enumString);
+		const auto index = std::distance(enumOtherStrings_ptr->begin(), found);
+		if (found == enumOtherStrings_ptr->end()) throw std::runtime_error(err);
+		else return static_cast<T>(index);
 	}
 
 	// Should only get here if the enum is not found so error
-	std::stringstream errMsg;
-	errMsg << "Enum name not recognised in enumFromString(const std::string& enumString). Name supplied was: " << enumString << std::endl
-		<< "Enum type being compared was: " << static_cast<std::string>(getTypeName<T>()) << std::endl;
-	std::string err = errMsg.str();
 	throw std::runtime_error(err);
 }
 
@@ -136,8 +132,82 @@ T enumFromString(const std::string_view enumString, size_t index, const std::str
 	}
 }
 
-//template <typename T>
-//stdenumToString
+/*
+* Convert an enum to a string
+*/
+template <typename T>
+std::string enumToString(T enumValue, std::string_view wantedStringType)
+{
+	static_assert(std::is_enum_v<T>); // Must be an enum
+
+	// Work out what type of string the caller wants and from what enum
+	std::vector<std::string> acceptedStringTypes{ "3Len", "Other" }; // Accepted string types based on enum arrays
+	const auto found = std::find(acceptedStringTypes.begin(), acceptedStringTypes.end(), wantedStringType);
+	const auto index = std::distance(acceptedStringTypes.begin(), found);
+	std::string_view enumName = getTypeName<T>();
+
+	if (found == acceptedStringTypes.end())
+	{
+		// This is an error state as the requested string type has not been found
+		std::stringstream errMsg;
+		errMsg << "Requested string type " << wantedStringType << " not recognised in "
+			<< "enumToString(T enumValue, std::string_view wantedStringType)";
+		std::string err = errMsg.str();
+		throw std::runtime_error(err);
+	}
+	else if (acceptedStringTypes[index] == "3Len")
+	{
+		if (enumName == "enum Month::Month")
+		{
+			return static_cast<std::string>(Month::monthStrings3Len[enumValue]);
+		}
+		else if (enumName == "enum Currency::Currency")
+		{
+			return static_cast<std::string>(Currency::currencyStrings3Len[enumValue]);
+		}
+		else if (enumName == "enum ItemType::ItemType")
+		{
+			return static_cast<std::string>(ItemType::itemTypeStrings3Len[enumValue]);
+		}
+		else if (enumName == "enum IncomeOrExpense::IncomeOrExpense")
+		{
+			return static_cast<std::string>(IncomeOrExpense::incomeOrExpenseStrings3Len[enumValue]);
+		}
+		else if (enumName == "enum BankName::BankName")
+		{
+			return static_cast<std::string>(BankName::bankNameStrings3Len[enumValue]);
+		}
+	}
+	else if (acceptedStringTypes[index] == "Other")
+	{
+		if (enumName == "enum Month::Month")
+		{
+			return static_cast<std::string>(Month::monthStringsOther[enumValue]);
+		}
+		else if (enumName == "enum Currency::Currency")
+		{
+			return static_cast<std::string>(Currency::currencyStringsOther[enumValue]);
+		}
+		else if (enumName == "enum ItemType::ItemType")
+		{
+			return static_cast<std::string>(ItemType::itemTypeStringsOther[enumValue]);
+		}
+		else if (enumName == "enum IncomeOrExpense::IncomeOrExpense")
+		{
+			return static_cast<std::string>(IncomeOrExpense::incomeOrExpenseStringsOther[enumValue]);
+		}
+		else if (enumName == "enum BankName::BankName")
+		{
+			return static_cast<std::string>(BankName::bankNameStringsOther[enumValue]);
+		}
+	}
+	
+	// Catch missing enum types
+	std::stringstream errMsg;
+	errMsg << "Enum type not recognised in enumFromString(const std::string & enumString).Type supplied was : " << enumName;
+	std::string err = errMsg.str();
+	throw std::runtime_error(err);
+}
 
 /*
 * Error check an enum

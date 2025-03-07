@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <iterator>
 
+#include "AccountingPeriod.h"
+
 #include "HelpfulFunctions.h"
 #include "LineValue.h"
 #include "BankName.h"
@@ -27,6 +29,8 @@
 #include "ItemType.h"
 #include "ItemTypeDiscriminator.h"
 
+class AccountingPeriod; // Breaks circular includes
+
 /**
  * This is the class that holds the processed data for the bank statement from the
  * csv file
@@ -35,21 +39,20 @@ class BankStatement
 {
 
 public:
+	BankStatement();
 	BankStatement(std::string& fname);
 	virtual ~BankStatement();
-	void printSummary();
 	// Maybe add copy constructor and assignment operator here?
+	void printSummary();
 
 private:
 	BankName::BankName bankName{ BankName::maxBanks };
 	std::vector<LineValue> expenses;
-	std::string accountingPeriod{ "" };
-	std::string_view accountingPeriod_ptr{ "" };
-	double avgIncome{ 0.0 };
-	double avgExpenditure{ 0.0 };
+	AccountingPeriod accountingPeriod;
+	double avgIncomeOverPeriod{ 0.0 };
+	double avgExpenditureOverPeriod{ 0.0 };
 
 	void makeSureDataIsAscending();
-	void determineAccountingPeriod();
 	void calculateAvgIncome();
 	void calculateAvgExpenditure();
 

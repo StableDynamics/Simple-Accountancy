@@ -7,6 +7,9 @@
 
 #include "BankStatement.h"
 
+BankStatement::BankStatement(){
+}
+
 BankStatement::BankStatement(std::string& fname)
 {
 	// Data vectors for the raw data from the file
@@ -135,7 +138,7 @@ BankStatement::BankStatement(std::string& fname)
 
 	// Housekeeping and variable assignment functions
 	makeSureDataIsAscending();
-	determineAccountingPeriod();
+	accountingPeriod = AccountingPeriod(&expenses);
 }
 
 
@@ -209,16 +212,6 @@ void BankStatement::makeSureDataIsAscending() {
 		}
 	}
 }
-
-/**
- * Determines the period that this accounting period is over based on the dates
- * supplied
- */
-void BankStatement::determineAccountingPeriod(){
-	// First value should be the oldest date
-	//accountingPeriod = std::to_string(expenses.begin()->day) + "/" + enumToString
-}
-
 
 /**
  * Calculates the average monthly income
