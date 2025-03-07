@@ -9,6 +9,9 @@
 
 #include "Month.h"
 #include "Currency.h"
+#include "ItemType.h"
+#include "IncomeOrExpense.h"
+#include "BankName.h"
 #include "ReturnTypeName.h"
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -29,7 +32,6 @@ T enumFromString(const std::string& enumString)
 
 	// Setup comparison string_views for the current enum type
 	std::string_view enumName = getTypeName<T>();
-	//TODO: Add more enum types here
 
 	// Based on the type of enum, setup data pointers
 	if (enumName == static_cast<std::string_view>("enum Month::Month"))
@@ -44,15 +46,33 @@ T enumFromString(const std::string& enumString)
 		enumOtherStrings_ptr = std::make_unique<const std::vector<std::string_view>>(Currency::currencyStringsOther);
 		length = enum3LenStrings_ptr->size();
 	}
+	else if (enumName == static_cast<std::string_view>("enum ItemType::ItemType"))
+	{
+		enum3LenStrings_ptr = std::make_unique<const std::vector<std::string_view>>(ItemType::itemTypeStrings3Len);
+		enumOtherStrings_ptr = std::make_unique<const std::vector<std::string_view>>(ItemType::itemTypeStringsOther);
+		length = enum3LenStrings_ptr->size();
+	}
+	else if (enumName == static_cast<std::string_view>("enum IncomeOrExpense::IncomeOrExpense"))
+	{
+		enum3LenStrings_ptr = std::make_unique<const std::vector<std::string_view>>(IncomeOrExpense::incomeOrExpenseStrings3Len);
+		enumOtherStrings_ptr = std::make_unique<const std::vector<std::string_view>>(IncomeOrExpense::incomeOrExpenseStringsOther);
+		length = enum3LenStrings_ptr->size();
+	}
+	else if (enumName == static_cast<std::string_view>("enum BankName::BankName"))
+	{
+		enum3LenStrings_ptr = std::make_unique<const std::vector<std::string_view>>(BankName::bankNameStrings3Len);
+		enumOtherStrings_ptr = std::make_unique<const std::vector<std::string_view>>(BankName::bankNameStringsOther);
+		length = enum3LenStrings_ptr->size();
+	}
 	else // Throw an exception saying that the enum type is not recognised
 	{
 		std::stringstream errMsg;
-		errMsg << "Enum type not recognised. Type supplied was: " << static_cast<std::string>(enumName) << std::endl;
+		errMsg << "Enum type not recognised in enumFromString(const std::string& enumString). Type supplied was: " << static_cast<std::string>(enumName) << std::endl;
 		std::string err = errMsg.str();
 		throw std::runtime_error(err);
 	}
 
-	//// Runthrough data variables to find the correct enum
+	// Runthrough data variables to find the correct enum
 	if (enumString.length() == 3)
 	{
 		for (size_t i = 0; i < enum3LenStrings_ptr->size(); i++)
@@ -74,9 +94,9 @@ T enumFromString(const std::string& enumString)
 		}
 	}
 
-	// Error if the month is not found
+	// Should only get here if the enum is not found so error
 	std::stringstream errMsg;
-	errMsg << "Enum name not recognised. Name supplied was: " << enumString << std::endl
+	errMsg << "Enum name not recognised in enumFromString(const std::string& enumString). Name supplied was: " << enumString << std::endl
 		<< "Enum type being compared was: " << static_cast<std::string>(getTypeName<T>()) << std::endl;
 	std::string err = errMsg.str();
 	throw std::runtime_error(err);
@@ -115,6 +135,9 @@ T enumFromString(const std::string& enumString, size_t index, const std::string&
 		throw std::runtime_error(err);
 	}
 }
+
+//template <typename T>
+//stdenumToString
 
 /*
 * Error check an enum

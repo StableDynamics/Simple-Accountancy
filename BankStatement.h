@@ -15,6 +15,7 @@
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
+#include <algorithm>
 
 #include "HelpfulFunctions.h"
 #include "LineValue.h"
@@ -33,18 +34,20 @@ class BankStatement
 {
 
 public:
-	BankStatement(std::string fname);
+	BankStatement(std::string& fname);
 	virtual ~BankStatement();
 	void printSummary();
 	// Maybe add copy constructor and assignment operator here?
 
 private:
-	BankName::BankName bankName;
+	BankName::BankName bankName{ BankName::maxBanks };
 	std::vector<LineValue> expenses;
-	std::string accountingPeriod;
-	double avgIncome;
-	double avgExpenditure;
+	std::string accountingPeriod{ "" };
+	std::string_view accountingPeriod_ptr{ "" };
+	double avgIncome{ 0.0 };
+	double avgExpenditure{ 0.0 };
 
+	void makeSureDataIsAscending();
 	void determineAccountingPeriod();
 	void calculateAvgIncome();
 	void calculateAvgExpenditure();

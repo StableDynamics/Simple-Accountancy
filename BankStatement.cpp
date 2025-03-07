@@ -7,7 +7,7 @@
 
 #include "BankStatement.h"
 
-BankStatement::BankStatement(std::string fname) : bankName{ BankName::Nationwide_UK }, accountingPeriod{ "" }, avgIncome{ 0 }, avgExpenditure{ 0 }
+BankStatement::BankStatement(std::string& fname)
 {
 	// Data vectors for the raw data from the file
 	std::vector<std::vector<std::string>> content;
@@ -16,7 +16,7 @@ BankStatement::BankStatement(std::string fname) : bankName{ BankName::Nationwide
 
 	// Blank line value object and associated blank data variables	
 	int startLine{ 0 };
-	LineValue lineValue = { 0, Month::January, 0, "", "", Currency::GBP, 0, 0, 0, IncomeOrExpense::Expense, ItemType::Bills };
+	LineValue lineValue;
 
 	// Open file using fstream for reading into Internal buffer
 	std::fstream file(fname, std::fstream::in);
@@ -59,7 +59,7 @@ BankStatement::BankStatement(std::string fname) : bankName{ BankName::Nationwide
 	}
 	else
 	{
-		throw std::runtime_error("Bank not recognised");
+		throw std::runtime_error("Bank not recognised in BankStatement::BankStatement(std::string& fname) BankName member variable assignment");
 	}
 
 	// Process content into LineValue objects
@@ -119,14 +119,23 @@ BankStatement::BankStatement(std::string fname) : bankName{ BankName::Nationwide
 		break;
 
 	case BankName::Natwest_UK:
+		// NatWest formats credit cards differently to current accounts in that the last entry is the balance
+		// in the account at the end of the period
 		break;
 	case BankName::Halifax_UK:
 		break;
 	case BankName::Tide_UK:
 		break;
 	default:
+		// Shouldn't be in here but if a bank has been added to the enum and hasn't been added to the switch
+		// it'll tell the dev what's happening
+		throw std::runtime_error("Bank not recognised in BankStatement::BankStatement(std::string& fname) LineValue Processing switch");
 		break;
 	}
+
+	// Housekeeping and variable assignment functions
+	makeSureDataIsAscending();
+	determineAccountingPeriod();
 }
 
 
@@ -149,11 +158,65 @@ void BankStatement::printSummary(){
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * Makes sure that the data in expenses is descending in date order
+ */
+void BankStatement::makeSureDataIsAscending() {
+	// Determine if the data in expenses is in ascending order (oldest first) or not, if not then
+	// rearrange it into ascending order
+	if (expenses.empty()) throw std::runtime_error("No data in expenses vector");
+	
+	// Check and rearrange as required
+	// ASSUMPTION: Data is in year order, then month order, then day order
+	if (expenses.begin()->year >= expenses.end()->year)
+	{
+		if (expenses.begin()->month >= expenses.end()->month)
+		{
+			if (expenses.begin()->day >= expenses.end()->day)
+			{
+				if (expenses.begin()->day == expenses.end()->day)
+				{
+					// Most bank csvs don't have time info so if the statement only contains transactions from the same day assumptions
+					// are made based on the bank
+					// Could possibly speed this up by removing the break's but need more support for banks
+					switch (bankName)
+					{
+					case BankName::Nationwide_UK:
+						// Nationwide UK csvs are in ascending order so no need to rearrange
+						break;
+					case BankName::Natwest_UK:
+						// Natwest UK csvs are in descending order so need to rearrange
+						std::reverse(expenses.begin(), expenses.end());
+						break;
+					case BankName::Halifax_UK:
+						// Currently unknown
+						break;
+					case BankName::Tide_UK:
+						// Currently unknown
+						break;
+					case BankName::maxBanks:
+						// Currently unknown
+						break;
+					default:
+						// Shouldn't be in here but if a bank has been added to the enum and hasn't been added to the switch
+						// it'll tell the dev what's happening
+						throw std::runtime_error("Bank not recognised in BankStatement::makeSureDataIsAscending()");
+						break;
+					}
+				}
+				// Expense is in descending order and needs to be rearranged
+				std::reverse(expenses.begin(), expenses.end());
+			}
+		}
+	}
+}
+
+/**
  * Determines the period that this accounting period is over based on the dates
  * supplied
  */
 void BankStatement::determineAccountingPeriod(){
-
+	// First value should be the oldest date
+	//accountingPeriod = std::to_string(expenses.begin()->day) + "/" + enumToString
 }
 
 
