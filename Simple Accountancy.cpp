@@ -9,6 +9,7 @@
 int main(int argc, char* argv[])
 {
     // Program takes in the filename at launch in the format of "path\filename.csv"
+    // Would be good to replace this with a file search if an argument has not been sipplied
     // Error check inputs
     if (argc < 2)
     {
