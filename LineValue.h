@@ -27,7 +27,6 @@ struct LineValue
 	Month::Month month{ Month::maxMonths };						// Month of the transaction
 	int day{ 0 };												// Day of the transaction
 	std::string description{ "" };								// Description of the transaction
-	std::string_view description_ptr{ "" };						// Pointer to the description
 	Currency::Currency currency{ Currency::maxCurrencies };		// Currency of the transaction
 	double paidIn{ 0.0 };										// Amount paid in
 	double paidOut{ 0.0 };										// Amount paid out

@@ -17,10 +17,6 @@ BankStatement::BankStatement(std::string& fname)
 	std::vector<std::string> row;
 	std::string line, word;
 
-	// Blank line value object and associated blank data variables	
-	int startLine{ 0 };
-	LineValue lineValue;
-
 	// Open file using fstream for reading into Internal buffer
 	std::fstream file(fname, std::fstream::in);
 	// Check to see if the file is open
@@ -66,79 +62,11 @@ BankStatement::BankStatement(std::string& fname)
 	}
 
 	// Process content into LineValue objects
-	switch (bankName)
-	{
-	case BankName::Nationwide_UK:
-		// Data starts on line 6 from Nationwide csvs
-		startLine = 5;
-
-		// Loop through the content and create LineValue objects
-		// would be nice to take the column row from the csv and match it up
-		// Hardcoded values are as such:
-		// 0 - Date
-		// 1 - Transaction Type
-		// 2 - Description
-		// 3 - Piad Out
-		// 4 - Paid In
-		// 5 - Balance
-		for (size_t i = startLine; i < content.size(); i++)
-		{
-			lineValue.day = std::stoi(content[i][0].substr(1,2));
-			lineValue.month = enumFromString<Month::Month>(content[i][0].substr(4, 3), i, fname);
-			lineValue.year = std::stoi(content[i][0].substr(8, 4));
-			lineValue.description = content[i][2].substr(1, content[i][2].size() - 2);
-			lineValue.description_ptr = static_cast<std::string_view>(lineValue.description);
-
-			// Assign Paid in/Paid out
-			// ASSUMPTION: csv file will not have 'information only' entries with no money values
-			if (content[i][3] == "\"\"") // Paid out is blank
-			{
-				lineValue.paidOut = 0.0;
-				lineValue.paidIn = std::stod(content[i][4].substr(2, content[i][4].size() - 3));
-				lineValue.currency = enumFromString<Currency::Currency>(content[i][4].substr(1, 1), i, fname);
-				lineValue.incomeOrExpense = IncomeOrExpense::Income;
-			}
-			else
-			{
-				lineValue.paidOut = std::stod(content[i][3].substr(2, content[i][3].size() - 3));
-				lineValue.paidIn = 0.0;
-				lineValue.currency = enumFromString<Currency::Currency>(content[i][3].substr(1, 1), i, fname);
-				lineValue.incomeOrExpense = IncomeOrExpense::Expense;
-			}
-
-			// Is balance positive or negative?
-			if (content[i][5].substr(1,1) == "-")
-			{
-				lineValue.balance = std::stod(content[i][5].substr(3, content[i][5].size() - 3));
-			}else
-				lineValue.balance = std::stod(content[i][5].substr(2, content[i][5].size() - 3));
-
-			// This is where a discrimiator would sit in order to determine the line item type
-			lineValue.itemType = determineItemType(lineValue.description_ptr);
-
-			// Push lineValue back into the expenses vector
-			expenses.push_back(lineValue);
-		}
-		break;
-
-	case BankName::Natwest_UK:
-		// NatWest formats credit cards differently to current accounts in that the last entry is the balance
-		// in the account at the end of the period
-		break;
-	case BankName::Halifax_UK:
-		break;
-	case BankName::Tide_UK:
-		break;
-	default:
-		// Shouldn't be in here but if a bank has been added to the enum and hasn't been added to the switch
-		// it'll tell the dev what's happening
-		throw std::runtime_error("Bank not recognised in BankStatement::BankStatement(std::string& fname) LineValue Processing switch");
-		break;
-	}
-
+	processRawData(content, fname);
+	
 	// Housekeeping and variable assignment functions
 	makeSureDataIsAscending();
-	accountingPeriod = AccountingPeriod(&expenses);
+	accountingPeriod = AccountingPeriod(expenses);
 }
 
 
@@ -159,6 +87,85 @@ void BankStatement::printSummary(){
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 * Private functions
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+* Process the raw data and assign it to expenses based on bank
+*/
+void BankStatement::processRawData(const std::vector<std::vector<std::string>>& content, const std::string& fname) {
+	// Blank line value object and associated blank data variables	
+	int startLine{ 0 };
+	LineValue lineValue;
+	
+	switch (bankName)
+	{
+	case BankName::Nationwide_UK:
+		// Data starts on line 6 from Nationwide csvs
+		startLine = 5;
+
+		// Loop through the content and create LineValue objects
+		// would be nice to take the column row from the csv and match it up
+		// Hardcoded values are as such:
+		// 0 - Date
+		// 1 - Transaction Type
+		// 2 - Description
+		// 3 - Piad Out
+		// 4 - Paid In
+		// 5 - Balance
+		for (size_t i = startLine; i < content.size(); i++)
+		{
+			lineValue.day = std::stoi(content[i][0].substr(1, 2));
+			lineValue.month = enumFromString<Month::Month>(content[i][0].substr(4, 3), i, fname);
+			lineValue.year = std::stoi(content[i][0].substr(8, 4));
+			lineValue.description = content[i][2].substr(1, content[i][2].size() - 2);
+
+			// Assign Paid in/Paid out
+			// ASSUMPTION: csv file will not have 'information only' entries with no money values
+			if (content[i][3] == "\"\"") // Paid out is blank
+			{
+				lineValue.paidOut = 0.0;
+				lineValue.paidIn = std::stod(content[i][4].substr(2, content[i][4].size() - 3));
+				lineValue.currency = enumFromString<Currency::Currency>(content[i][4].substr(1, 1), i, fname);
+				lineValue.incomeOrExpense = IncomeOrExpense::Income;
+			}
+			else
+			{
+				lineValue.paidOut = std::stod(content[i][3].substr(2, content[i][3].size() - 3));
+				lineValue.paidIn = 0.0;
+				lineValue.currency = enumFromString<Currency::Currency>(content[i][3].substr(1, 1), i, fname);
+				lineValue.incomeOrExpense = IncomeOrExpense::Expense;
+			}
+
+			// Is balance positive or negative?
+			if (content[i][5].substr(1, 1) == "-")
+			{
+				lineValue.balance = std::stod(content[i][5].substr(3, content[i][5].size() - 3));
+			}
+			else
+				lineValue.balance = std::stod(content[i][5].substr(2, content[i][5].size() - 3));
+
+			// This is where a discrimiator would sit in order to determine the line item type
+			lineValue.itemType = determineItemType(lineValue.description);
+
+			// Push lineValue back into the expenses vector
+			expenses.push_back(lineValue);
+		}
+		break;
+
+	case BankName::Natwest_UK:
+		// NatWest formats credit cards differently to current accounts in that the last entry is the balance
+		// in the account at the end of the period
+		break;
+	case BankName::Halifax_UK:
+		break;
+	case BankName::Tide_UK:
+		break;
+	default:
+		// Shouldn't be in here but if a bank has been added to the enum and hasn't been added to the switch
+		// it'll tell the dev what's happening
+		throw std::runtime_error("Bank not recognised in BankStatement::BankStatement(std::string& fname) LineValue Processing switch");
+		break;
+	}
+}
 
 /**
  * Makes sure that the data in expenses is descending in date order

@@ -11,14 +11,14 @@
 AccountingPeriod::AccountingPeriod() {
 }
 
-AccountingPeriod::AccountingPeriod(const std::vector<LineValue>* expenses_ptr){
+AccountingPeriod::AccountingPeriod(const std::vector<LineValue>& expenses){
 	// Assign member variables
-	startDay	= expenses_ptr->begin()->day;
-	startMonth	= expenses_ptr->begin()->month;
-	startYear	= expenses_ptr->begin()->year;
-	endDay		= std::prev(expenses_ptr->end())->day;
-	endMonth	= std::prev(expenses_ptr->end())->month;
-	endYear		= std::prev(expenses_ptr->end())->year;
+	startDay	= expenses.begin()->day;
+	startMonth	= expenses.begin()->month;
+	startYear	= expenses.begin()->year;
+	endDay		= std::prev(expenses.end())->day;
+	endMonth	= std::prev(expenses.end())->month;
+	endYear		= std::prev(expenses.end())->year;
 	populateDescription();
 }
 
@@ -43,5 +43,5 @@ void AccountingPeriod::populateDescription(){
  * Provides a string view of the descriptionString
  */
 std::string_view AccountingPeriod::getDescriptionString_ptr(){
-	return std::string_view("");
+	return std::string_view(descriptionString);
 }

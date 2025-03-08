@@ -25,7 +25,7 @@ class AccountingPeriod
 
 public:
 	AccountingPeriod();
-	AccountingPeriod(const std::vector<LineValue>* expenses_ptr);
+	AccountingPeriod(const std::vector<LineValue>& expenses);
 	virtual ~AccountingPeriod();
 
 	std::string_view getDescriptionString_ptr();

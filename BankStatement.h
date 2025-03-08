@@ -52,6 +52,7 @@ private:
 	double avgIncomeOverPeriod{ 0.0 };
 	double avgExpenditureOverPeriod{ 0.0 };
 
+	void processRawData(const std::vector<std::vector<std::string>>& content, const std::string& fname);
 	void makeSureDataIsAscending();
 	void calculateAvgIncome();
 	void calculateAvgExpenditure();
