@@ -12,6 +12,7 @@
 #include <string_view>
 #include <stdexcept>
 #include <iterator>
+#include <sstream>
 
 #include "Month.h"
 #include "LineValue.h"
@@ -28,7 +29,7 @@ public:
 	AccountingPeriod(const std::vector<LineValue>& expenses);
 	virtual ~AccountingPeriod();
 
-	std::string_view getDescriptionString_ptr();
+	std::string_view getDescriptionString_ptr(int idx);
 
 private:
 	int startDay{ 0 };
@@ -37,7 +38,9 @@ private:
 	int endDay{ 0 };
 	Month::Month endMonth{ Month::maxMonths };
 	int endYear{ 0 };
-	std::string descriptionString{ "" };
+	std::string descriptionString3Len{ "" };
+	std::string descriptionStringLong{ "" };
+	std::string descriptionStringNum{ "" };
 
 	void populateDescription();
 
