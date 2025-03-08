@@ -51,15 +51,7 @@ BankStatement::BankStatement(std::string& fname)
 	}
 
 	// Determine what Bank the statement is from
-	// ASSUMPTION: the first entry in content is unique to the bank
-	if (content[0][0] == "\"Account Name:\"")
-	{
-		bankName = BankName::Nationwide_UK;
-	}
-	else
-	{
-		throw std::runtime_error("Bank not recognised in BankStatement::BankStatement(std::string& fname) BankName member variable assignment");
-	}
+	determineBank(content);
 
 	// Process content into LineValue objects
 	processRawData(content, fname);
@@ -89,6 +81,21 @@ void BankStatement::printSummary(){
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
+*Workout the bankName from the raw data
+*/
+void BankStatement::determineBank(const std::vector<std::vector<std::string>>& content) {
+	// ASSUMPTION: the way data is formatted in the csv is unique to every bank
+	if (content[0][0] == "\"Account Name:\"")
+	{
+		bankName = BankName::Nationwide_UK;
+	}
+	else
+	{
+		throw std::runtime_error("Bank not recognised in BankStatement::BankStatement(std::string& fname) BankName member variable assignment");
+	}
+}
+
+/*
 * Process the raw data and assign it to expenses based on bank
 */
 void BankStatement::processRawData(const std::vector<std::vector<std::string>>& content, const std::string& fname) {
@@ -96,6 +103,7 @@ void BankStatement::processRawData(const std::vector<std::vector<std::string>>& 
 	int startLine{ 0 };
 	LineValue lineValue;
 	
+	// Process raw data based on Bank
 	switch (bankName)
 	{
 	case BankName::Nationwide_UK:
@@ -162,7 +170,8 @@ void BankStatement::processRawData(const std::vector<std::vector<std::string>>& 
 	default:
 		// Shouldn't be in here but if a bank has been added to the enum and hasn't been added to the switch
 		// it'll tell the dev what's happening
-		throw std::runtime_error("Bank not recognised in BankStatement::BankStatement(std::string& fname) LineValue Processing switch");
+		throw std::runtime_error("Bank not recognised in "
+			"processRawData(const std::vector<std::vector<std::string>>& content, const std::string& fname) bankName processing switch");
 		break;
 	}
 }
