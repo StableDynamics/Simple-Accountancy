@@ -29,8 +29,6 @@
 #include "ItemType.h"
 #include "ItemTypeDiscriminator.h"
 
-class AccountingPeriod; // Breaks circular includes
-
 /**
  * This is the class that holds the processed data for the bank statement from the
  * csv file

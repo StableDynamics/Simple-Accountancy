@@ -27,8 +27,8 @@ T enumFromString(const std::string_view enumString)
 	static_assert(std::is_enum_v<T>); // Must be an enum
 	
 	// Setup blank data variables
-	std::unique_ptr<const std::vector<std::string_view>> enum3LenStrings_ptr;
-	std::unique_ptr<const std::vector<std::string_view>> enumOtherStrings_ptr;
+	std::unique_ptr<const std::vector<std::string_view>> enum3LenStrings_sv;
+	std::unique_ptr<const std::vector<std::string_view>> enumOtherStrings_sv;
 	size_t length{ 0 };
 
 	// Determine enum name as a string_view
@@ -37,28 +37,28 @@ T enumFromString(const std::string_view enumString)
 	// Based on the type of enum, setup data pointers, could this be done better?
 	if constexpr (std::is_same_v<T, Month::Month>)
 	{
-		enum3LenStrings_ptr = std::make_unique<const std::vector<std::string_view>>(Month::monthStrings3Len);
-		enumOtherStrings_ptr = std::make_unique<const std::vector<std::string_view>>(Month::monthStringsOther);
+		enum3LenStrings_sv = std::make_unique<const std::vector<std::string_view>>(Month::monthStrings3Len);
+		enumOtherStrings_sv = std::make_unique<const std::vector<std::string_view>>(Month::monthStringsOther);
 	}
 	else if constexpr (std::is_same_v<T, Currency::Currency>)
 	{
-		enum3LenStrings_ptr = std::make_unique<const std::vector<std::string_view>>(Currency::currencyStrings3Len);
-		enumOtherStrings_ptr = std::make_unique<const std::vector<std::string_view>>(Currency::currencyStringsOther);
+		enum3LenStrings_sv = std::make_unique<const std::vector<std::string_view>>(Currency::currencyStrings3Len);
+		enumOtherStrings_sv = std::make_unique<const std::vector<std::string_view>>(Currency::currencyStringsOther);
 	}
 	else if constexpr (std::is_same_v<T, ItemType::ItemType>)
 	{
-		enum3LenStrings_ptr = std::make_unique<const std::vector<std::string_view>>(ItemType::itemTypeStrings3Len);
-		enumOtherStrings_ptr = std::make_unique<const std::vector<std::string_view>>(ItemType::itemTypeStringsOther);
+		enum3LenStrings_sv = std::make_unique<const std::vector<std::string_view>>(ItemType::itemTypeStrings3Len);
+		enumOtherStrings_sv = std::make_unique<const std::vector<std::string_view>>(ItemType::itemTypeStringsOther);
 	}
 	else if constexpr (std::is_same_v<T, IncomeOrExpense::IncomeOrExpense>)
 	{
-		enum3LenStrings_ptr = std::make_unique<const std::vector<std::string_view>>(IncomeOrExpense::incomeOrExpenseStrings3Len);
-		enumOtherStrings_ptr = std::make_unique<const std::vector<std::string_view>>(IncomeOrExpense::incomeOrExpenseStringsOther);
+		enum3LenStrings_sv = std::make_unique<const std::vector<std::string_view>>(IncomeOrExpense::incomeOrExpenseStrings3Len);
+		enumOtherStrings_sv = std::make_unique<const std::vector<std::string_view>>(IncomeOrExpense::incomeOrExpenseStringsOther);
 	}
 	else if constexpr (std::is_same_v<T, BankName::BankName>)
 	{
-		enum3LenStrings_ptr = std::make_unique<const std::vector<std::string_view>>(BankName::bankNameStrings3Len);
-		enumOtherStrings_ptr = std::make_unique<const std::vector<std::string_view>>(BankName::bankNameStringsOther);
+		enum3LenStrings_sv = std::make_unique<const std::vector<std::string_view>>(BankName::bankNameStrings3Len);
+		enumOtherStrings_sv = std::make_unique<const std::vector<std::string_view>>(BankName::bankNameStringsOther);
 	}
 	else // Throw an exception saying that the enum type is not recognised
 	{
@@ -68,7 +68,7 @@ T enumFromString(const std::string_view enumString)
 		throw std::runtime_error(err);
 	}
 	// Both arrays *should* be same length
-	length = enum3LenStrings_ptr->size();
+	length = enum3LenStrings_sv->size();
 
 	// Define error message
 	std::stringstream errMsg;
@@ -79,16 +79,16 @@ T enumFromString(const std::string_view enumString)
 	// Runthrough data variables to find the correct enum
 	if (enumString.length() == 3)
 	{
-		const auto found = std::find(enum3LenStrings_ptr->begin(), enum3LenStrings_ptr->end(), enumString);
-		const auto index = std::distance(enum3LenStrings_ptr->begin(), found);
-		if (found == enum3LenStrings_ptr->end()) throw std::runtime_error(err);
+		const auto found = std::find(enum3LenStrings_sv->begin(), enum3LenStrings_sv->end(), enumString);
+		const auto index = std::distance(enum3LenStrings_sv->begin(), found);
+		if (found == enum3LenStrings_sv->end()) throw std::runtime_error(err);
 		else return static_cast<T>(index);
 	}
 	else
 	{
-		const auto found = std::find(enumOtherStrings_ptr->begin(), enumOtherStrings_ptr->end(), enumString);
-		const auto index = std::distance(enumOtherStrings_ptr->begin(), found);
-		if (found == enumOtherStrings_ptr->end()) throw std::runtime_error(err);
+		const auto found = std::find(enumOtherStrings_sv->begin(), enumOtherStrings_sv->end(), enumString);
+		const auto index = std::distance(enumOtherStrings_sv->begin(), found);
+		if (found == enumOtherStrings_sv->end()) throw std::runtime_error(err);
 		else return static_cast<T>(index);
 	}
 

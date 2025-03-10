@@ -34,7 +34,7 @@ AccountingPeriod::~AccountingPeriod(){
 /**
  * Provides a string view of the descriptionString
  */
-std::string_view AccountingPeriod::getDescriptionString_ptr(int idx){
+std::string_view AccountingPeriod::getDescriptionString_sv(int idx){
 	// Return a string_view of the requested description based on the index
 	// 0 = 3Len string
 	// 1 = Long string
@@ -50,7 +50,7 @@ std::string_view AccountingPeriod::getDescriptionString_ptr(int idx){
 	default:
 		// If caller uses wrong value
 		std::stringstream errMsg;
-		errMsg << "AccountingPeriod::getDescriptionString_ptr(int idx) does not recognise idx of " << idx << "."
+		errMsg << "AccountingPeriod::getDescriptionString_sv(int idx) does not recognise idx of " << idx << "."
 			<< " Recognised idx values are 0 for 3Len, 1 for Long, and 2 for Num." << std::endl;
 		std::string err = errMsg.str();
 		throw std::runtime_error(err);
