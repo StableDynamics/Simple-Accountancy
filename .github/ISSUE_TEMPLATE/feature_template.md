@@ -1,7 +1,7 @@
 ---
 name: Feature Template
 about: This template provides a default setup for a feature for the project to complete
-  akin that will contain sub-tasks/issues/bugs
+  that will contain sub-tasks/issues/bugs
 title: 'FEATURE: '
 labels: ''
 assignees: ''
