@@ -11,6 +11,7 @@
 #include <vector>
 #include <numeric>
 #include <array>
+#include <functional>
 
 #include "Month.h"
 #include "itemType.h"
@@ -29,11 +30,18 @@ public:
 private:
 	std::vector<int> yearsContained{ 0 };
 	std::vector<std::vector<Month::Month>> monthsContained = { {} };
-	// Arrangement of monthlyTotals, onthlyOccurances and monthlyAverages
+	// Arrangement of processedStatement, monthlyTotals, monthlyOccurances and monthlyAverages
 	// year.month.currency.incomeOrExpense.type
 	// Type explained below:
 	// 0 - maxItemTypes = totals according to ItemType enum
-	// end = Total
+	// end = Totals
+	std::vector<
+		std::vector<
+			std::array<
+				std::array<
+					std::array<std::vector<std::reference_wrapper<const LineValue>>, static_cast<int>(ItemType::maxItemTypes) + 1>,
+					static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>,
+		static_cast<int>(Currency::maxCurrencies)>>> processedStatement = { {{{{{}}}}} }; // Processed LineValues into their categories
 	std::vector<
 		std::vector<
 			std::array<
@@ -58,7 +66,7 @@ private:
 
 
 	size_t returnTotalIndex();
-	void determineItemType(const LineValue& expense, const int monthIdx, const int yearIdx);
+	void determineItemType(const LineValue& expense, const size_t monthIdx, const size_t yearIdx);
 	void checkArrays(const std::vector<LineValue>& expenses);
 	void calculateAverages();
 

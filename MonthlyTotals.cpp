@@ -17,12 +17,14 @@ MonthlyTotals::MonthlyTotals(){
 MonthlyTotals::MonthlyTotals(const std::vector<LineValue>& expenses) {
 	// Calculate the years contained in this statement
 	//calculateYearRange(expenses);
-
+	
 	// Reference indexes
 	size_t yearIdx{ 0 };
 	size_t monthIdx{ 0 };
 
 	// Reference blank array
+	auto blankProcessedYearArray = processedStatement[0];
+	auto blankProcessedMonthArray = processedStatement[0][0];
 	auto blankMonthlyTotalsYearArray = monthlyTotals[0];
 	auto blankMonthlyOccurancesYearArray = monthlyOccurances[0];
 	auto blankMonthlyTotalsMonthArray = monthlyTotals[0][0];
@@ -45,6 +47,7 @@ MonthlyTotals::MonthlyTotals(const std::vector<LineValue>& expenses) {
 			yearsContained.push_back(expenses[i].year);
 
 			// Create new year in monthly arrays
+			processedStatement.push_back(blankProcessedYearArray);
 			monthlyTotals.push_back(blankMonthlyTotalsYearArray);
 			monthlyOccurances.push_back(blankMonthlyOccurancesYearArray);
 			monthlyAverages.push_back(blankMonthlyTotalsYearArray);
@@ -59,6 +62,7 @@ MonthlyTotals::MonthlyTotals(const std::vector<LineValue>& expenses) {
 		if (foundMonth == monthsContained[yearIdx].end())
 		{
 			monthsContained[yearIdx].push_back(expenses[i].month);
+			processedStatement[yearIdx].push_back(blankProcessedMonthArray);
 			monthlyTotals[yearIdx].push_back(blankMonthlyTotalsMonthArray);
 			monthlyAverages[yearIdx].push_back(blankMonthlyTotalsMonthArray);
 			monthlyOccurances[yearIdx].push_back(blankMonthlyOccurancesMonthArray);
@@ -97,7 +101,7 @@ size_t MonthlyTotals:: returnTotalIndex() {
 /*
 * Determine the Line Item type and assign to the totalsByType array
 */
-void MonthlyTotals::determineItemType(const LineValue& expense, const int monthIdx, const int yearIdx) {
+void MonthlyTotals::determineItemType(const LineValue& expense, const size_t monthIdx, const size_t yearIdx) {
 	// Pull out indexes
 	size_t iOrEIdx = static_cast<size_t>(expense.incomeOrExpense);
 	size_t currencyIdx = static_cast<size_t>(expense.currency);
@@ -139,6 +143,10 @@ void MonthlyTotals::determineItemType(const LineValue& expense, const int monthI
 	// Increment monthlyOccurances
 	monthlyOccurances[yearIdx][monthIdx][currencyIdx][iOrEIdx][totalIdx] += 1;
 	monthlyOccurances[yearIdx][monthIdx][currencyIdx][iOrEIdx][itemTypeIdx] += 1;
+
+	// Setup references to original object
+	processedStatement[yearIdx][monthIdx][currencyIdx][iOrEIdx][totalIdx].push_back(expense);
+	processedStatement[yearIdx][monthIdx][currencyIdx][iOrEIdx][itemTypeIdx].push_back(expense);
 }
 
 /*
