@@ -19,6 +19,7 @@
 #include <iterator>
 
 #include "AccountingPeriod.h"
+#include "MonthlyTotals.h"
 
 #include "HelpfulFunctions.h"
 #include "LineValue.h"
@@ -47,6 +48,7 @@ private:
 	BankName::BankName bankName{ BankName::maxBanks };
 	std::vector<LineValue> expenses;
 	AccountingPeriod accountingPeriod;
+	MonthlyTotals monthlyTotals;
 	double avgIncomeOverPeriod{ 0.0 };
 	double avgExpenditureOverPeriod{ 0.0 };
 

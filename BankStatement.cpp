@@ -63,6 +63,7 @@ BankStatement::BankStatement(std::string& fname)
 	// Housekeeping and variable assignment functions
 	makeSureDataIsAscending();
 	accountingPeriod = AccountingPeriod(expenses);
+	monthlyTotals = MonthlyTotals(expenses);
 }
 
 
@@ -190,6 +191,7 @@ void BankStatement::makeSureDataIsAscending() {
 	
 	// Check and rearrange as required
 	// ASSUMPTION: Data is in year order, then month order, then day order
+	// Worth just using sort on data regardless of bank, technically less efficient but does that matter with a csv?
 	if (expenses.begin()->year >= std::prev(expenses.end())->year)
 	{
 		if (expenses.begin()->month >= std::prev(expenses.end())->month)

@@ -15,6 +15,7 @@
 #include "IncomeOrExpense.h"
 #include "ItemType.h"
 #include "Currency.h"
+#include "HelpfulFunctions.h"
 
 /**
  * This struct contains the data from each line of the csv, wondering if this should be a class instead...
@@ -34,6 +35,9 @@ struct LineValue
 	IncomeOrExpense::IncomeOrExpense incomeOrExpense
 	{ IncomeOrExpense::maxIncomeOrExpense };					// Is it an income or an expense
 	ItemType::ItemType itemType{ ItemType::maxItemTypes };		// What type of item is it?
+
+	std::string lineValueSummary(int threeOrOtherMonth, 
+		int threeOrOtherCurrency) const;								// Prints summary of LineValue
 
 };
 #endif // !defined(LINEVALUE)
