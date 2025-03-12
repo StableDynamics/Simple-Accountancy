@@ -18,13 +18,15 @@
 #include "LineValue.h"
 #include "IncomeOrExpense.h"
 #include "HelpfulFunctions.h"
+#include "BankFileImporter.h"
 
-class MonthlyTotals
+class MonthlyTotals : public BankFileImporter
 {
 
 public:
 	MonthlyTotals();
-	MonthlyTotals(const std::vector<LineValue>& expenses);
+	MonthlyTotals(const std::vector<LineValue>& expenses); // TO BE DELETED
+	MonthlyTotals(const std::string& fname);
 	virtual ~MonthlyTotals();
 
 private:
@@ -67,7 +69,8 @@ private:
 
 	size_t returnTotalIndex();
 	void determineItemType(const LineValue& expense, const size_t monthIdx, const size_t yearIdx);
-	void checkArrays(const std::vector<LineValue>& expenses);
+	void checkArrays(const std::vector<LineValue>& expenses); // TO BE DELETED
+	void checkArrays(const std::vector<std::reference_wrapper<LineValue>> expenses);
 	void calculateAverages();
 
 };

@@ -5,6 +5,8 @@
 #include "HelpfulFunctions.h"
 #include "ItemType.h"
 #include "IncomeOrExpense.h"
+#include "BankFileImporter.h"
+#include "MonthlyTotals.h"
 
 int main(int argc, char* argv[])
 {
@@ -45,11 +47,13 @@ int main(int argc, char* argv[])
         // Create AccountData class object for supplied file
         try
         {
-            BankStatement statement(fname);
+            BankFileImporter temp(fname);
+            MonthlyTotals temp2(fname);
+            /*BankStatement statement(fname);
 
             std::cout << "Created class from " << fname << "\n\n";
 
-			statements.push_back(statement);
+			statements.push_back(statement);*/
         }
         catch (const std::exception& e)
         {

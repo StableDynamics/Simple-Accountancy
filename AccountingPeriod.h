@@ -29,7 +29,7 @@ public:
 	AccountingPeriod(const std::vector<LineValue>& expenses);
 	virtual ~AccountingPeriod();
 
-	std::string_view getDescriptionString_sv(int idx);
+	const std::string_view getDescriptionString_sv(int idx) const;
 
 private:
 	int startDay{ 0 };

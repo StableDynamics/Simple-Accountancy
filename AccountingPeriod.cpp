@@ -34,7 +34,7 @@ AccountingPeriod::~AccountingPeriod(){
 /**
  * Provides a string view of the descriptionString
  */
-std::string_view AccountingPeriod::getDescriptionString_sv(int idx){
+const std::string_view AccountingPeriod::getDescriptionString_sv(int idx) const{
 	// Return a string_view of the requested description based on the index
 	// 0 = 3Len string
 	// 1 = Long string

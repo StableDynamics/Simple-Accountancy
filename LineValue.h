@@ -37,7 +37,7 @@ struct LineValue
 	ItemType::ItemType itemType{ ItemType::maxItemTypes };		// What type of item is it?
 
 	std::string lineValueSummary(int threeOrOtherMonth, 
-		int threeOrOtherCurrency) const;								// Prints summary of LineValue
+		int threeOrOtherCurrency) const;						// Prints summary of this LineValue
 
 };
 #endif // !defined(LINEVALUE)
