@@ -47,13 +47,11 @@ int main(int argc, char* argv[])
         // Create AccountData class object for supplied file
         try
         {
-            BankFileImporter temp(fname);
-            MonthlyTotals temp2(fname);
-            /*BankStatement statement(fname);
+            BankStatement statement(fname);
 
             std::cout << "Created class from " << fname << "\n\n";
 
-			statements.push_back(statement);*/
+			statements.push_back(statement);
         }
         catch (const std::exception& e)
         {

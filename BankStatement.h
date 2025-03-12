@@ -19,6 +19,7 @@
 
 #include "AccountingPeriod.h"
 #include "MonthlyTotals.h"
+#include "BankFileImporter.h"
 
 #include "HelpfulFunctions.h"
 #include "LineValue.h"
@@ -30,30 +31,23 @@
 #include "ItemTypeDiscriminator.h"
 
 /**
- * This is the class that holds the processed data for the bank statement from the
- * csv file
+ * This class inherits from MonthlyTotals and is meant to contain more advanced 
+ * analysis funcitons and display functions
  */
-class BankStatement
+class BankStatement : public MonthlyTotals
 {
 
 public:
 	BankStatement();
-	BankStatement(std::string& fname);
+	BankStatement(const std::string& fname);
 	virtual ~BankStatement();
 	// Maybe add copy constructor and assignment operator here?
 	void printSummary();
 
 private:
-	BankName::BankName bankName{ BankName::maxBanks };
-	std::vector<LineValue> expenses;
-	AccountingPeriod accountingPeriod;
-	MonthlyTotals monthlyTotals;
 	double avgIncomeOverPeriod{ 0.0 };
 	double avgExpenditureOverPeriod{ 0.0 };
 
-	void determineBank(const std::vector<std::vector<std::string>>& content);
-	void processRawData(const std::vector<std::vector<std::string>>& content, const std::string& fname);
-	void makeSureDataIsAscending();
 	void calculateAvgIncome();
 	void calculateAvgExpenditure();
 

@@ -20,12 +20,14 @@
 #include "HelpfulFunctions.h"
 #include "BankFileImporter.h"
 
+/*
+* This class inherits the data from BankFileImporter and then processes the data to work out totals and averages per month per year
+*/
 class MonthlyTotals : public BankFileImporter
 {
 
 public:
 	MonthlyTotals();
-	MonthlyTotals(const std::vector<LineValue>& expenses); // TO BE DELETED
 	MonthlyTotals(const std::string& fname);
 	virtual ~MonthlyTotals();
 
@@ -69,7 +71,6 @@ private:
 
 	size_t returnTotalIndex();
 	void determineItemType(const LineValue& expense, const size_t monthIdx, const size_t yearIdx);
-	void checkArrays(const std::vector<LineValue>& expenses); // TO BE DELETED
 	void checkArrays(const std::vector<std::reference_wrapper<LineValue>> expenses);
 	void calculateAverages();
 

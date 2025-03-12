@@ -20,7 +20,9 @@
 #include "HelpfulFunctions.h"
 #include "ItemTypeDiscriminator.h"
 
-
+/*
+* This class receives a filename and imports it into a series of LineValues based on which bank the statement is from
+*/
 class BankFileImporter
 {
 
