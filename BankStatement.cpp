@@ -55,9 +55,9 @@ void BankStatement::calculateAvg(){
 		for (auto month : year) {
 			totalMonths += 1;
 			for (auto currency : month)
-				for (size_t i = 0; i < currency.size(); i++)
+				for (size_t i = 0; i < currency.size(); i++) // Income or expense?
 				{
-					for (size_t j = 0; j < currency[i].size(); j++)
+					for (size_t j = 0; j < currency[i].size(); j++) // Item type
 					{
 						avgByType[i][j] += currency[i][j];
 					}

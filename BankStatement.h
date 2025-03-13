@@ -45,6 +45,7 @@ public:
 	void printSummary();
 
 private:
+	// Stores monthly averages arranged by income or expense
 	std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>, 2> avgByType = {};
 
 	void calculateAvg();
