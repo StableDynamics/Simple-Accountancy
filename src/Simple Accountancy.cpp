@@ -36,22 +36,24 @@ int main(int argc, char* argv[])
         return -1;
     }
 	
-	// Create vector of bank statements
-	std::vector<BankStatement> statements;
+	// Create vectors of class objects
+    std::vector<BankFileImporter> bankFileImportersVec;
+    std::vector<MonthlyTotals> monthlyTotalsVec;
+	std::vector<BankStatement> bankStatementsVec;
 
     // Loop through all the files that were supplied
     for (size_t i = 1; i < argc; i++)
     {
         std::string fname{ argv[i] };
 
-        // Create AccountData class object for supplied file
+        // Create class objects for supplied file
         try
         {
-            BankStatement statement(fname);
+            bankFileImportersVec.emplace_back(fname);
+            monthlyTotalsVec.emplace_back(fname);
+			bankStatementsVec.emplace_back(fname);
 
             std::cout << "Created class from " << fname << "\n\n";
-
-			statements.push_back(statement);
         }
         catch (const std::exception& e)
         {

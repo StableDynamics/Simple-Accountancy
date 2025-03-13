@@ -30,10 +30,18 @@ public:
 	BankFileImporter();
 	BankFileImporter(const std::string& fname);
 	virtual ~BankFileImporter();
+	BankFileImporter(const BankFileImporter& other); // Copy constructor
+	BankFileImporter(BankFileImporter&& other) noexcept; // Move constructor
 
 	const std::string getBankName() const;
 	const std::vector<std::reference_wrapper<LineValue>> getRawExpRef() const;
 	const AccountingPeriod& getAccountingPeriod() const;
+
+	// Overloaded operators
+	BankFileImporter& operator=(BankFileImporter other);
+
+	// Friend functions
+	friend void swap(BankFileImporter& first, BankFileImporter& second);
 
 private:
 	BankName::BankName bankName{ BankName::maxBanks };
@@ -46,6 +54,7 @@ private:
 	void determineBank(const std::vector<std::vector<std::string>>& content);
 	void nationwideUKProcessing(const std::vector<std::vector<std::string>>& content, const std::string& fname);
 	void makeSureDataIsAscending();
+	virtual void refreshRefs();
 
 };
 #endif // !defined(BANKFILEIMPORTER)

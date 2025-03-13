@@ -30,6 +30,31 @@ AccountingPeriod::~AccountingPeriod(){
 
 }
 
+/*
+* Copy constructor
+*/
+AccountingPeriod::AccountingPeriod(const AccountingPeriod& other) 
+: startDay(other.startDay),
+startMonth(other.startMonth),
+startYear(other.startYear),
+endDay(other.endDay),
+endMonth(other.endMonth),
+endYear(other.endYear),
+descriptionString3Len(other.descriptionString3Len),
+descriptionStringLong(other.descriptionStringLong),
+descriptionStringNum(other.descriptionStringNum)
+{	
+}
+
+
+/*
+* Move constructor
+*/
+AccountingPeriod::AccountingPeriod(AccountingPeriod&& other) noexcept
+: AccountingPeriod() {
+	swap(*this, other);
+}
+
 
 /**
  * Provides a string view of the descriptionString
@@ -55,6 +80,29 @@ const std::string_view AccountingPeriod::getDescriptionString_sv(int idx) const{
 		std::string err = errMsg.str();
 		throw std::runtime_error(err);
 	}
+}
+
+
+// Overloaded operators
+AccountingPeriod& AccountingPeriod::operator=(AccountingPeriod other) {
+	swap(*this, other);
+
+	return *this;
+}
+
+// Friend Functions
+void swap(AccountingPeriod& first, AccountingPeriod& second) {
+	using std::swap; // Allows association to the std::swap function
+
+	swap(first.startDay, second.startDay);
+	swap(first.startMonth, second.startMonth);
+	swap(first.startYear, second.startYear);
+	swap(first.endDay, second.endDay);
+	swap(first.endMonth, second.endMonth);
+	swap(first.endYear, second.endYear);
+	swap(first.descriptionString3Len, second.descriptionString3Len);
+	swap(first.descriptionStringLong, second.descriptionStringLong);
+	swap(first.descriptionStringNum, second.descriptionStringNum);
 }
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

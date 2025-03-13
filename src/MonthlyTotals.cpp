@@ -90,6 +90,29 @@ MonthlyTotals::~MonthlyTotals(){
 }
 
 
+/*
+* Copy constructor
+*/
+MonthlyTotals::MonthlyTotals(const MonthlyTotals& other)
+	: yearsContained(other.yearsContained),
+	monthsContained(other.monthsContained),
+	monthlyTotals(other.monthlyTotals),
+	monthlyOccurances(other.monthlyOccurances),
+	monthlyAverages(other.monthlyAverages)
+{
+	//refreshRefs();
+}
+
+
+/*
+* Move constructor
+*/
+MonthlyTotals::MonthlyTotals(MonthlyTotals&& other) noexcept
+	: MonthlyTotals() {
+	swap(*this, other);
+}
+
+
 const std::vector<std::vector<std::array<std::array<std::array<std::vector<std::reference_wrapper<const LineValue>>,
 	static_cast<int>(ItemType::maxItemTypes) + 1>, static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>,
 	static_cast<int>(Currency::maxCurrencies)>>> MonthlyTotals::getProcessedStatement() const 
@@ -124,6 +147,23 @@ const std::vector<size_t> MonthlyTotals::getYearMonthAmounts() {
 }
 
 
+// Overloaded operators
+MonthlyTotals& MonthlyTotals::operator=(MonthlyTotals other) {
+	swap(*this, other);
+
+	//this->refreshRefs(); // Refresh references
+
+	return *this;
+}
+
+// Friend Functions
+void swap(MonthlyTotals& first, MonthlyTotals& second) {
+	using std::swap; // Allows association to the std::swap function
+
+	
+}
+
+
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 * Private functions
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,8 +181,8 @@ size_t MonthlyTotals:: returnTotalIndex() {
 */
 void MonthlyTotals::determineItemType(const LineValue& expense, const size_t monthIdx, const size_t yearIdx) {
 	// Pull out indexes
-	size_t iOrEIdx = static_cast<size_t>(expense.incomeOrExpense);
 	size_t currencyIdx = static_cast<size_t>(expense.currency);
+	size_t iOrEIdx = static_cast<size_t>(expense.incomeOrExpense);
 	size_t itemTypeIdx = static_cast<size_t>(expense.itemType);
 	size_t totalIdx = returnTotalIndex();
 	
@@ -228,4 +268,12 @@ void MonthlyTotals::calculateAverages(){
 					for (size_t m = 0; m < static_cast<size_t>(ItemType::maxItemTypes) + 1; m++)
 						monthlyAverages[i][j][k][l][m] = (monthlyOccurances[i][j][k][l][m] == 0) ? 0.0 : 
 							monthlyTotals[i][j][k][l][m] / monthlyOccurances[i][j][k][l][m];
+}
+
+
+/*
+* Refreshes the reference array for processedStatement
+*/
+void MonthlyTotals::refreshRefs() {
+	
 }

@@ -27,6 +27,7 @@ struct LineValue
 	int year{ 0 };												// Year of the transaction
 	Month::Month month{ Month::maxMonths };						// Month of the transaction
 	int day{ 0 };												// Day of the transaction
+	std::string transactType{ "" };								// Type of transaction
 	std::string description{ "" };								// Description of the transaction
 	Currency::Currency currency{ Currency::maxCurrencies };		// Currency of the transaction
 	double paidIn{ 0.0 };										// Amount paid in

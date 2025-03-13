@@ -30,6 +30,8 @@ public:
 	MonthlyTotals();
 	MonthlyTotals(const std::string& fname);
 	virtual ~MonthlyTotals();
+	MonthlyTotals(const MonthlyTotals& other); // Copy constructor
+	MonthlyTotals(MonthlyTotals&& other) noexcept; // Move constructor
 
 	const std::vector<std::vector<std::array<std::array<std::array<std::vector<std::reference_wrapper<const LineValue>>,
 		static_cast<int>(ItemType::maxItemTypes) + 1>, static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>,
@@ -45,6 +47,12 @@ public:
 		static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& getMonthlyAverages() const;
 
 	const std::vector<size_t> getYearMonthAmounts();
+
+	// Overloaded operators
+	MonthlyTotals& operator=(MonthlyTotals other);
+
+	// Friend functions
+	friend void swap(MonthlyTotals& first, MonthlyTotals& second);
 
 private:
 	std::vector<int> yearsContained{ 0 };
@@ -88,6 +96,7 @@ private:
 	void determineItemType(const LineValue& expense, const size_t monthIdx, const size_t yearIdx);
 	void checkArrays(const std::vector<std::reference_wrapper<LineValue>> expenses);
 	void calculateAverages();
+	virtual void refreshRefs();
 
 };
 #endif // !defined(MONTHLYTOTALS)

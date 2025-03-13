@@ -29,7 +29,7 @@ BankFileImporter::BankFileImporter(const std::string& fname) {
 	makeSureDataIsAscending();
 
 	// Create reference wrapper for rawExpenses
-	rawExpensesRef = { rawExpenses.begin(), rawExpenses.end() };
+	refreshRefs();
 
 	// Create the AccountingPeriod
 	accountingPeriod = AccountingPeriod(rawExpenses);
@@ -38,6 +38,27 @@ BankFileImporter::BankFileImporter(const std::string& fname) {
 
 BankFileImporter::~BankFileImporter(){
 
+}
+
+
+/*
+* Copy constructor
+*/
+BankFileImporter::BankFileImporter(const BankFileImporter& other)
+	: bankName(other.bankName),
+rawExpenses(other.rawExpenses),
+accountingPeriod(other.accountingPeriod)
+{
+	refreshRefs();
+}
+
+
+/*
+* Move constructor
+*/
+BankFileImporter::BankFileImporter(BankFileImporter&& other) noexcept
+	: BankFileImporter() {
+	swap(*this, other);
 }
 
 
@@ -57,6 +78,24 @@ const AccountingPeriod& BankFileImporter::getAccountingPeriod() const {
 	return  accountingPeriod;
 }
 
+// Overloaded operators
+BankFileImporter& BankFileImporter::operator=(BankFileImporter other) {
+	swap(*this, other);
+
+	this->refreshRefs(); // Refresh references
+
+	return *this;
+}
+
+// Friend Functions
+void swap(BankFileImporter& first, BankFileImporter& second) {
+	using std::swap; // Allows association to the std::swap function
+
+	swap(first.bankName, second.bankName);
+	swap(first.rawExpenses, second.rawExpenses); // rawExpensesRef is not copied as it'll contain garbage data so can be left blank
+	second.refreshRefs();
+	swap(first.accountingPeriod, second.accountingPeriod);
+}
 
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,6 +137,10 @@ std::vector<std::vector<std::string>> BankFileImporter::importFile(const std::st
 	}
 	else
 	{
+		// Close the file
+		file.close();
+
+		// Error
 		std::stringstream errMsg;
 		errMsg << "File could not be opened. Supplied address of file below:\n\n" << fname << "\n";
 		std::string err = errMsg.str();
@@ -168,6 +211,7 @@ void BankFileImporter::nationwideUKProcessing(const std::vector<std::vector<std:
 		lineValue.day = std::stoi(content[i][0].substr(1, 2));
 		lineValue.month = enumFromString<Month::Month>(content[i][0].substr(4, 3), i, fname);
 		lineValue.year = std::stoi(content[i][0].substr(8, 4));
+		lineValue.transactType = content[i][1].substr(1, content[i][1].size() - 2);
 		lineValue.description = content[i][2].substr(1, content[i][2].size() - 2);
 
 		// Assign Paid in/Paid out
@@ -211,7 +255,7 @@ void BankFileImporter::makeSureDataIsAscending(){
 
 	// Check and rearrange as required
 	// ASSUMPTION: Data is in year order, then month order, then day order
-	// Worth just using sort on data regardless of bank, technically less efficient but does that matter with a csv?
+	// Worth just using sort on data regardless of bank?
 	if (rawExpenses.begin()->year >= std::prev(rawExpenses.end())->year)
 	{
 		if (rawExpenses.begin()->month >= std::prev(rawExpenses.end())->month)
@@ -256,3 +300,9 @@ void BankFileImporter::makeSureDataIsAscending(){
 }
 
 
+/*
+* Refreshes/creates the reference array to the rawExpenses
+*/
+void BankFileImporter::refreshRefs() {
+	rawExpensesRef = { rawExpenses.begin(), rawExpenses.end() };
+}

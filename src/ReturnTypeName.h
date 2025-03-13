@@ -7,7 +7,7 @@
 #endif
 
 /*
-* Return the name of the typesupplied as a string
+* Return the name of the type supplied as a string
 */
 template <typename T> constexpr std::string_view getTypeName();
 
