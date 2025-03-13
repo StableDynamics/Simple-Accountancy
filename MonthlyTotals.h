@@ -31,6 +31,21 @@ public:
 	MonthlyTotals(const std::string& fname);
 	virtual ~MonthlyTotals();
 
+	const std::vector<std::vector<std::array<std::array<std::array<std::vector<std::reference_wrapper<const LineValue>>,
+		static_cast<int>(ItemType::maxItemTypes) + 1>, static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>,
+		static_cast<int>(Currency::maxCurrencies)>>> getProcessedStatement() const;
+
+	const std::vector<std::vector<std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
+		static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& getMonthlyTotals() const;
+
+	const std::vector<std::vector<std::array<std::array<std::array<uint64_t, static_cast<int>(ItemType::maxItemTypes) + 1>,
+		static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& getMonthlyOccurances() const;
+
+	const std::vector<std::vector<std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
+		static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& getMonthlyAverages() const;
+
+	const std::vector<size_t> getYearMonthAmounts();
+
 private:
 	std::vector<int> yearsContained{ 0 };
 	std::vector<std::vector<Month::Month>> monthsContained = { {} };
@@ -66,7 +81,7 @@ private:
 				std::array<
 					std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
 					static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>,
-					static_cast<int>(Currency::maxCurrencies)>>> monthlyAverages = { {{{{}}}} }; // Average per type
+					static_cast<int>(Currency::maxCurrencies)>>> monthlyAverages = { {{{{}}}} }; // Average singular transaction per type
 
 
 	size_t returnTotalIndex();

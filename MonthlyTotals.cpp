@@ -73,6 +73,9 @@ MonthlyTotals::MonthlyTotals(const std::string& fname) : BankFileImporter::BankF
 
 		// Assign values
 		determineItemType(expenses[i], monthIdx, yearIdx);
+
+		// Calculate Averages
+		calculateAverages();
 	}
 
 	// Check array sizes are the same
@@ -86,6 +89,39 @@ MonthlyTotals::~MonthlyTotals(){
 
 }
 
+
+const std::vector<std::vector<std::array<std::array<std::array<std::vector<std::reference_wrapper<const LineValue>>,
+	static_cast<int>(ItemType::maxItemTypes) + 1>, static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>,
+	static_cast<int>(Currency::maxCurrencies)>>> MonthlyTotals::getProcessedStatement() const 
+{
+	return processedStatement;
+}
+
+const std::vector<std::vector<std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
+	static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& MonthlyTotals::getMonthlyTotals() const 
+{
+	return monthlyTotals;
+}
+
+const std::vector<std::vector<std::array<std::array<std::array<uint64_t, static_cast<int>(ItemType::maxItemTypes) + 1>,
+	static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& MonthlyTotals::getMonthlyOccurances() const 
+{
+	return monthlyOccurances;
+}
+
+const std::vector<std::vector<std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
+	static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& MonthlyTotals::getMonthlyAverages() const 
+{
+	return monthlyAverages;
+}
+
+const std::vector<size_t> MonthlyTotals::getYearMonthAmounts() {
+	std::vector<size_t> yearMonth;
+	for (auto val : monthsContained)
+		yearMonth.push_back(static_cast<size_t>(val.size()));
+	
+	return yearMonth;
+}
 
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -184,5 +220,12 @@ void MonthlyTotals::checkArrays(const std::vector<std::reference_wrapper<LineVal
 * Calculate the average values for Income and Expenses by ItemType per month per year
 */
 void MonthlyTotals::calculateAverages(){
-
+	// Loop through the arrays and calculate the average monetary value per type
+	for (size_t i = 0; i < yearsContained.size(); i++)
+		for (size_t j = 0; j < monthsContained[i].size(); j++)
+			for (size_t k = 0; k < static_cast<size_t>(Currency::maxCurrencies); k++)
+				for (size_t l = 0; l < static_cast<size_t>(IncomeOrExpense::maxIncomeOrExpense); l++)
+					for (size_t m = 0; m < static_cast<size_t>(ItemType::maxItemTypes) + 1; m++)
+						monthlyAverages[i][j][k][l][m] = (monthlyOccurances[i][j][k][l][m] == 0) ? 0.0 : 
+							monthlyTotals[i][j][k][l][m] / monthlyOccurances[i][j][k][l][m];
 }

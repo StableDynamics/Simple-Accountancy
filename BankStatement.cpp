@@ -15,8 +15,7 @@ BankStatement::BankStatement(){
 }
 
 BankStatement::BankStatement(const std::string& fname) : MonthlyTotals::MonthlyTotals(fname){
-	calculateAvgIncome();
-	calculateAvgExpenditure();
+	calculateAvg();
 }
 
 
@@ -42,14 +41,31 @@ void BankStatement::printSummary(){
 /**
  * Calculates the average monthly income
  */
-void BankStatement::calculateAvgIncome(){
+void BankStatement::calculateAvg(){
+	const std::vector<size_t> vectorSizes = getYearMonthAmounts();
 
-}
+	// loop through the monthlyTotals and calculate the average income
+	int totalMonths{ 0 };
 
 
-/**
- * Calculates the average monthly expenditure
- */
-void BankStatement::calculateAvgExpenditure(){
+	const std::vector<std::vector<std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
+		static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>> monthlyTotals =  getMonthlyTotals();
 
+	for (auto year : monthlyTotals)
+		for (auto month : year) {
+			totalMonths += 1;
+			for (auto currency : month)
+				for (size_t i = 0; i < currency.size(); i++)
+				{
+					for (size_t j = 0; j < currency[i].size(); j++)
+					{
+						avgByType[i][j] += currency[i][j];
+					}
+				}
+		}
+	
+	// Calculate Averages
+	for (auto& itemTypes : avgByType)
+		for (auto& item : itemTypes)
+			item = item / static_cast<double>(totalMonths);
 }

@@ -45,11 +45,9 @@ public:
 	void printSummary();
 
 private:
-	double avgIncomeOverPeriod{ 0.0 };
-	double avgExpenditureOverPeriod{ 0.0 };
+	std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>, 2> avgByType = {};
 
-	void calculateAvgIncome();
-	void calculateAvgExpenditure();
+	void calculateAvg();
 
 };
 #endif // !defined(BANKSTATEMENT)
