@@ -41,6 +41,8 @@ int main(int argc, char* argv[])
     std::vector<MonthlyTotals> monthlyTotalsVec;
 	std::vector<BankStatement> bankStatementsVec;
 
+    MonthlyTotals temp;
+
     // Loop through all the files that were supplied
     for (size_t i = 1; i < argc; i++)
     {
@@ -49,6 +51,10 @@ int main(int argc, char* argv[])
         // Create class objects for supplied file
         try
         {
+            temp = MonthlyTotals(fname);
+
+            monthlyTotalsVec.push_back(temp);
+            
             bankFileImportersVec.emplace_back(fname);
             monthlyTotalsVec.emplace_back(fname);
 			bankStatementsVec.emplace_back(fname);

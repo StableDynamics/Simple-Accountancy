@@ -92,8 +92,9 @@ private:
 					static_cast<int>(Currency::maxCurrencies)>>> monthlyAverages = { {{{{}}}} }; // Average singular transaction per type
 
 
+	const std::vector<std::reference_wrapper<LineValue>> processStatement(int newOrRefresh = 0);
 	size_t returnTotalIndex();
-	void determineItemType(const LineValue& expense, const size_t monthIdx, const size_t yearIdx);
+	void determineItemType(const LineValue& expense, const size_t monthIdx, const size_t yearIdx, int newOrRefresh = 0);
 	void checkArrays(const std::vector<std::reference_wrapper<LineValue>> expenses);
 	void calculateAverages();
 	virtual void refreshRefs();

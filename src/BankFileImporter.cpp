@@ -93,7 +93,7 @@ void swap(BankFileImporter& first, BankFileImporter& second) {
 
 	swap(first.bankName, second.bankName);
 	swap(first.rawExpenses, second.rawExpenses); // rawExpensesRef is not copied as it'll contain garbage data so can be left blank
-	second.refreshRefs();
+	first.BankFileImporter::refreshRefs(); second.BankFileImporter::refreshRefs();
 	swap(first.accountingPeriod, second.accountingPeriod);
 }
 
