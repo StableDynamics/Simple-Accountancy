@@ -30,22 +30,6 @@ AccountingPeriod::~AccountingPeriod(){
 
 }
 
-/*
-* Copy constructor
-*/
-AccountingPeriod::AccountingPeriod(const AccountingPeriod& other) 
-: startDay(other.startDay),
-startMonth(other.startMonth),
-startYear(other.startYear),
-endDay(other.endDay),
-endMonth(other.endMonth),
-endYear(other.endYear),
-descriptionString3Len(other.descriptionString3Len),
-descriptionStringLong(other.descriptionStringLong),
-descriptionStringNum(other.descriptionStringNum)
-{	
-}
-
 
 /*
 * Move constructor

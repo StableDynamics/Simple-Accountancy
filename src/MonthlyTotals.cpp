@@ -17,7 +17,8 @@ MonthlyTotals::MonthlyTotals(){
 
 MonthlyTotals::MonthlyTotals(const std::string& fname) : BankFileImporter::BankFileImporter(fname) {
 	// Process statement
-	const std::vector<std::reference_wrapper<LineValue>> expenses = processStatement();
+	std::vector<std::reference_wrapper<LineValue>> expenses = BankFileImporter::getRawExpRef();
+	processStatement(expenses);
 
 	// Check array sizes are the same
 	checkArrays(expenses);
@@ -28,20 +29,6 @@ MonthlyTotals::MonthlyTotals(const std::string& fname) : BankFileImporter::BankF
 
 MonthlyTotals::~MonthlyTotals(){
 
-}
-
-
-/*
-* Copy constructor
-*/
-MonthlyTotals::MonthlyTotals(const MonthlyTotals& other)
-	: yearsContained(other.yearsContained),
-	monthsContained(other.monthsContained),
-	monthlyTotals(other.monthlyTotals),
-	monthlyOccurances(other.monthlyOccurances),
-	monthlyAverages(other.monthlyAverages)
-{
-	refreshRefs();
 }
 
 
@@ -74,9 +61,9 @@ const std::vector<std::vector<std::array<std::array<std::array<uint64_t, static_
 }
 
 const std::vector<std::vector<std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
-	static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& MonthlyTotals::getMonthlyAverages() const 
+	static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& MonthlyTotals::getmonthlyAvgSnglTrnsct() const 
 {
-	return monthlyAverages;
+	return monthlyAvgSnglTrnsct;
 }
 
 const std::vector<size_t> MonthlyTotals::getYearMonthAmounts() {
@@ -92,8 +79,6 @@ const std::vector<size_t> MonthlyTotals::getYearMonthAmounts() {
 MonthlyTotals& MonthlyTotals::operator=(MonthlyTotals other) {
 	swap(*this, other);
 
-	this->refreshRefs(); // Refresh references
-
 	return *this;
 }
 
@@ -104,9 +89,10 @@ void swap(MonthlyTotals& first, MonthlyTotals& second) {
 	swap(static_cast<BankFileImporter&>(first), static_cast<BankFileImporter&>(second)); // Swap base class
 	swap(first.yearsContained, second.yearsContained);
 	swap(first.monthsContained, second.monthsContained);
+	first.MonthlyTotals::refreshRefs(); second.MonthlyTotals::refreshRefs();
 	swap(first.monthlyTotals, second.monthlyTotals);
 	swap(first.monthlyOccurances, second.monthlyOccurances);
-	swap(first.monthlyAverages, second.monthlyAverages);
+	swap(first.monthlyAvgSnglTrnsct, second.monthlyAvgSnglTrnsct);
 }
 
 
@@ -117,7 +103,7 @@ void swap(MonthlyTotals& first, MonthlyTotals& second) {
 /*
 * Process the statement with a switch to work out if it's everything or just the references that need to be reprocessed
 */
-const std::vector<std::reference_wrapper<LineValue>> MonthlyTotals::processStatement(int newOrRefresh) {
+void MonthlyTotals::processStatement(const std::vector<std::reference_wrapper<LineValue>> expenses, int newOrRefresh) {
 	if (newOrRefresh > 1) throw std::runtime_error("MonthlyTotals::processStatement(int newOrRefresh) called with wrong value. "
 		"Acceptable values are 0 for new object and 1 for refresh of references.");
 	// Function changes based on input newOrRefresh
@@ -125,9 +111,10 @@ const std::vector<std::reference_wrapper<LineValue>> MonthlyTotals::processState
 	// 1 = move/copy of object and reference arrays need to be updated
 	
 	// Reference indexes
+	if (expenses.empty()) return; // Check to see if expenses contains data, and if not then skip function (happens if swap is being used on a blank object)
+	
 	size_t yearIdx{ 0 };
 	size_t monthIdx{ 0 };
-	std::vector<std::reference_wrapper<LineValue>> expenses = BankFileImporter::getRawExpRef();
 
 	// Reference blank array
 	auto blankProcessedYearArray = processedStatement[0];
@@ -138,8 +125,9 @@ const std::vector<std::reference_wrapper<LineValue>> MonthlyTotals::processState
 	auto blankMonthlyOccurancesMonthArray = monthlyOccurances[0][0];
 
 	// Assign values from first entry
-	yearsContained[0] = expenses[0].get().year;
-	monthsContained[0].push_back(expenses[0].get().month);
+	std::vector<int> years = { expenses[0].get().year };
+	std::vector<std::vector<Month::Month>> months = { {expenses[0].get().month} };
+	
 
 	// Setup depending on newOrRefresh
 	if (newOrRefresh == 0) {
@@ -157,53 +145,52 @@ const std::vector<std::reference_wrapper<LineValue>> MonthlyTotals::processState
 	for (size_t i = 1; i < expenses.size(); i++)
 	{
 		// Assign year
-		auto foundYear = std::find(yearsContained.begin(), yearsContained.end(), expenses[i].get().year);
-		if (foundYear == yearsContained.end())
+		auto foundYear = std::find(years.begin(), years.end(), expenses[i].get().year);
+		if (foundYear == years.end())
 		{
 			switch (newOrRefresh)
 			{
 			case 0: // Runs into case 1 due to processedStatement and index increments applying to both
-				yearsContained.push_back(expenses[i].get().year);
-
 				// Create new year in monthly arrays
 				monthlyTotals.push_back(blankMonthlyTotalsYearArray);
 				monthlyOccurances.push_back(blankMonthlyOccurancesYearArray);
-				monthlyAverages.push_back(blankMonthlyTotalsYearArray);
-				monthsContained.push_back({ expenses[i].get().month });
+				monthlyAvgSnglTrnsct.push_back(blankMonthlyTotalsYearArray);
 				[[fallthrough]];
 			case 1:
+				years.push_back(expenses[i].get().year);
+				months.push_back({ expenses[i].get().month });
 				processedStatement.push_back(blankProcessedYearArray);
-
-				yearIdx += 1; // Increment Year
-				monthIdx = 0; // Restart Month
 				break;
 			default:
 				// Shouldn't get in here due to error check at start
 				break;
 			}
+
+			yearIdx += 1; // Increment Year
+			monthIdx = 0; // Restart Month
 		}
 
 		// Assign Month
-		auto foundMonth = std::find(monthsContained[yearIdx].begin(), monthsContained[yearIdx].end(), expenses[i].get().month);
-		if (foundMonth == monthsContained[yearIdx].end())
+		auto foundMonth = std::find(months[yearIdx].begin(), months[yearIdx].end(), expenses[i].get().month);
+		if (foundMonth == months[yearIdx].end())
 		{
 			switch (newOrRefresh)
 			{
 			case 0: // Runs into case 1 due to processedStatement and index increments applying to both
-				monthsContained[yearIdx].push_back(expenses[i].get().month);
 				monthlyTotals[yearIdx].push_back(blankMonthlyTotalsMonthArray);
-				monthlyAverages[yearIdx].push_back(blankMonthlyTotalsMonthArray);
+				monthlyAvgSnglTrnsct[yearIdx].push_back(blankMonthlyTotalsMonthArray);
 				monthlyOccurances[yearIdx].push_back(blankMonthlyOccurancesMonthArray);
 				[[fallthrough]];
 			case 1:
+				months[yearIdx].push_back(expenses[i].get().month);
 				processedStatement[yearIdx].push_back(blankProcessedMonthArray);
-
-				monthIdx += 1;
 				break;
 			default:
 				// Shouldn't get in here due to error check at start
 				break;
 			}
+
+			monthIdx += 1;
 		}
 
 		// Assign values
@@ -213,7 +200,20 @@ const std::vector<std::reference_wrapper<LineValue>> MonthlyTotals::processState
 		if (newOrRefresh == 0) calculateAverages();
 	}
 
-	return expenses;
+	switch (newOrRefresh)
+	{
+	case 0:
+		yearsContained = years;
+		monthsContained = months;
+		break;
+	case 1: // For refresh do nothing
+		break;
+	default:
+		// Shouldn't get in here
+		break;
+	}
+	
+	return;
 }
 
 /*
@@ -330,7 +330,7 @@ void MonthlyTotals::calculateAverages(){
 			for (size_t k = 0; k < static_cast<size_t>(Currency::maxCurrencies); k++)
 				for (size_t l = 0; l < static_cast<size_t>(IncomeOrExpense::maxIncomeOrExpense); l++)
 					for (size_t m = 0; m < static_cast<size_t>(ItemType::maxItemTypes) + 1; m++)
-						monthlyAverages[i][j][k][l][m] = (monthlyOccurances[i][j][k][l][m] == 0) ? 0.0 : 
+						monthlyAvgSnglTrnsct[i][j][k][l][m] = (monthlyOccurances[i][j][k][l][m] == 0) ? 0.0 : 
 							monthlyTotals[i][j][k][l][m] / monthlyOccurances[i][j][k][l][m];
 }
 
@@ -339,5 +339,5 @@ void MonthlyTotals::calculateAverages(){
 * Refreshes the reference array for processedStatement
 */
 void MonthlyTotals::refreshRefs() {
-	processStatement(1);
+	processStatement(BankFileImporter::getRawExpRef(), 1);
 }

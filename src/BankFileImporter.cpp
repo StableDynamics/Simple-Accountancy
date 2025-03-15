@@ -42,18 +42,6 @@ BankFileImporter::~BankFileImporter(){
 
 
 /*
-* Copy constructor
-*/
-BankFileImporter::BankFileImporter(const BankFileImporter& other)
-	: bankName(other.bankName),
-rawExpenses(other.rawExpenses),
-accountingPeriod(other.accountingPeriod)
-{
-	refreshRefs();
-}
-
-
-/*
 * Move constructor
 */
 BankFileImporter::BankFileImporter(BankFileImporter&& other) noexcept
@@ -155,9 +143,9 @@ std::vector<std::vector<std::string>> BankFileImporter::importFile(const std::st
 */
 void BankFileImporter::determineBank(const std::vector<std::vector<std::string>>& content) {
 	// ASSUMPTION: the way data is formatted in the csv is unique to every bank
-	if (content[0][0] == "\"Account Name:\"")
+	if (content[0][0] == "\"Account Name:\"") // Consistent with Nationwide statements from 2024 - Present
 	{
-		bankName = BankName::Nationwide_UK;
+		bankName = BankName::Nationwide_UK_2024;
 	}
 	else
 	{
@@ -172,7 +160,7 @@ void BankFileImporter::processRawFStream(const std::vector<std::vector<std::stri
 	// Process raw data based on Bank
 	switch (bankName)
 	{
-	case BankName::Nationwide_UK:
+	case BankName::Nationwide_UK_2024:
 		nationwideUKProcessing(content, fname);
 		break;
 	case BankName::Natwest_UK:
@@ -193,57 +181,68 @@ void BankFileImporter::processRawFStream(const std::vector<std::vector<std::stri
 }
 
 void BankFileImporter::nationwideUKProcessing(const std::vector<std::vector<std::string>>& content, const std::string& fname){
+	// Currently supports CUrrent account, savings account, and ISA statements with the format current in 2024 - Present
+	// Reference variables
 	LineValue lineValue;
-	// Data starts on line 6 from Nationwide csvs
-	size_t startLine = 5;
+	size_t startLine{};
 
-	// Loop through the content and create LineValue objects
-	// would be nice to take the column row from the csv and match it up
-	// Hardcoded values are as such:
-	// 0 - Date
-	// 1 - Transaction Type
-	// 2 - Description
-	// 3 - Piad Out
-	// 4 - Paid In
-	// 5 - Balance
-	for (size_t i = startLine; i < content.size(); i++)
+	switch (bankName)
 	{
-		lineValue.day = std::stoi(content[i][0].substr(1, 2));
-		lineValue.month = enumFromString<Month::Month>(content[i][0].substr(4, 3), i, fname);
-		lineValue.year = std::stoi(content[i][0].substr(8, 4));
-		lineValue.transactType = content[i][1].substr(1, content[i][1].size() - 2);
-		lineValue.description = content[i][2].substr(1, content[i][2].size() - 2);
+	case BankName::Nationwide_UK_2024:
+		// Data starts on line 6 from Nationwide csvs
+		startLine = 6;
 
-		// Assign Paid in/Paid out
-		// ASSUMPTION: csv file will not have 'information only' entries with no money values
-		if (content[i][3] == "\"\"") // Paid out is blank
+		// Loop through the content and create LineValue objects
+		// would be nice to take the column row from the csv and match it up
+		// Hardcoded values are as such:
+		// 0 - Date
+		// 1 - Transaction Type
+		// 2 - Description
+		// 3 - Piad Out
+		// 4 - Paid In
+		// 5 - Balance
+		for (size_t i = startLine; i < content.size(); i++)
 		{
-			lineValue.paidOut = 0.0;
-			lineValue.paidIn = std::stod(content[i][4].substr(2, content[i][4].size() - 3));
-			lineValue.currency = enumFromString<Currency::Currency>(content[i][4].substr(1, 1), i, fname);
-			lineValue.incomeOrExpense = IncomeOrExpense::Income;
-		}
-		else
-		{
-			lineValue.paidOut = std::stod(content[i][3].substr(2, content[i][3].size() - 3));
-			lineValue.paidIn = 0.0;
-			lineValue.currency = enumFromString<Currency::Currency>(content[i][3].substr(1, 1), i, fname);
-			lineValue.incomeOrExpense = IncomeOrExpense::Expense;
-		}
+			lineValue.day = std::stoi(content[i][0].substr(1, 2));
+			lineValue.month = enumFromString<Month::Month>(content[i][0].substr(4, 3), i, fname);
+			lineValue.year = std::stoi(content[i][0].substr(8, 4));
+			lineValue.transactType = content[i][1].substr(1, content[i][1].size() - 2);
+			lineValue.description = content[i][2].substr(1, content[i][2].size() - 2);
 
-		// Is balance positive or negative?
-		if (content[i][5].substr(1, 1) == "-")
-		{
-			lineValue.balance = std::stod(content[i][5].substr(3, content[i][5].size() - 3));
+			// Assign Paid in/Paid out
+			// ASSUMPTION: csv file will not have 'information only' entries with no money values
+			if (content[i][3] == "\"\"") // Paid out is blank
+			{
+				lineValue.paidOut = 0.0;
+				lineValue.paidIn = std::stod(content[i][4].substr(2, content[i][4].size() - 3));
+				lineValue.currency = enumFromString<Currency::Currency>(content[i][4].substr(1, 1), i, fname);
+				lineValue.incomeOrExpense = IncomeOrExpense::Income;
+			}
+			else
+			{
+				lineValue.paidOut = std::stod(content[i][3].substr(2, content[i][3].size() - 3));
+				lineValue.paidIn = 0.0;
+				lineValue.currency = enumFromString<Currency::Currency>(content[i][3].substr(1, 1), i, fname);
+				lineValue.incomeOrExpense = IncomeOrExpense::Expense;
+			}
+
+			// Is balance positive or negative?
+			if (content[i][5].substr(1, 1) == "-")
+			{
+				lineValue.balance = std::stod(content[i][5].substr(3, content[i][5].size() - 3));
+			}
+			else
+				lineValue.balance = std::stod(content[i][5].substr(2, content[i][5].size() - 3));
+
+			// This is where a discrimiator would sit in order to determine the line item type
+			lineValue.itemType = determineItemType(lineValue.description);
+
+			// Push lineValue back into the expenses vector
+			rawExpenses.push_back(lineValue);
 		}
-		else
-			lineValue.balance = std::stod(content[i][5].substr(2, content[i][5].size() - 3));
-
-		// This is where a discrimiator would sit in order to determine the line item type
-		lineValue.itemType = determineItemType(lineValue.description);
-
-		// Push lineValue back into the expenses vector
-		rawExpenses.push_back(lineValue);
+		break;
+	default:
+		break;
 	}
 }
 
@@ -269,7 +268,7 @@ void BankFileImporter::makeSureDataIsAscending(){
 					// Could possibly speed this up by removing the break's but need more support for banks
 					switch (bankName)
 					{
-					case BankName::Nationwide_UK:
+					case BankName::Nationwide_UK_2024:
 						// Nationwide UK csvs are in ascending order so no need to rearrange
 						break;
 					case BankName::Natwest_UK:

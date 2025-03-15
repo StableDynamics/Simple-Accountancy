@@ -30,7 +30,7 @@ public:
 	BankFileImporter();
 	BankFileImporter(const std::string& fname);
 	virtual ~BankFileImporter();
-	BankFileImporter(const BankFileImporter& other); // Copy constructor
+	BankFileImporter(const BankFileImporter& other) = default; // Copy constructor
 	BankFileImporter(BankFileImporter&& other) noexcept; // Move constructor
 
 	const std::string getBankName() const;

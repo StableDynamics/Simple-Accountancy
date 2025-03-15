@@ -28,7 +28,7 @@ public:
 	AccountingPeriod();
 	AccountingPeriod(const std::vector<LineValue>& expenses);
 	virtual ~AccountingPeriod();
-	AccountingPeriod(const AccountingPeriod& other); // Copy constructor
+	AccountingPeriod(const AccountingPeriod& other) = default; // Copy constructor
 	AccountingPeriod(AccountingPeriod&& other) noexcept; // Move constructor
 
 	const std::string_view getDescriptionString_sv(int idx) const;

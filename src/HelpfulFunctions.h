@@ -29,7 +29,6 @@ T enumFromString(const std::string_view enumString)
 	// Setup blank data variables
 	std::unique_ptr<const std::vector<std::string_view>> enum3LenStrings_sv;
 	std::unique_ptr<const std::vector<std::string_view>> enumOtherStrings_sv;
-	size_t length{ 0 };
 
 	// Determine enum name as a string_view
 	std::string_view enumName = getTypeName<T>();
@@ -68,7 +67,6 @@ T enumFromString(const std::string_view enumString)
 		throw std::runtime_error(err);
 	}
 	// Both arrays *should* be same length
-	length = enum3LenStrings_sv->size();
 
 	// Define error message
 	std::stringstream errMsg;

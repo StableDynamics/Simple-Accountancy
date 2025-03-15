@@ -39,7 +39,7 @@ void BankStatement::printSummary(){
 
 
 /**
- * Calculates the average monthly income
+ * Calculates the averages per month
  */
 void BankStatement::calculateAvg(){
 	const std::vector<size_t> vectorSizes = getYearMonthAmounts();

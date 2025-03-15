@@ -18,7 +18,7 @@ namespace BankName
 {
 	enum BankName
 	{
-		Nationwide_UK,
+		Nationwide_UK_2024,
 		Natwest_UK,
 		Halifax_UK,
 		Tide_UK,

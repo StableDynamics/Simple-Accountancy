@@ -30,7 +30,7 @@ public:
 	MonthlyTotals();
 	MonthlyTotals(const std::string& fname);
 	virtual ~MonthlyTotals();
-	MonthlyTotals(const MonthlyTotals& other); // Copy constructor
+	MonthlyTotals(const MonthlyTotals& other) = default; // Copy constructor
 	MonthlyTotals(MonthlyTotals&& other) noexcept; // Move constructor
 
 	const std::vector<std::vector<std::array<std::array<std::array<std::vector<std::reference_wrapper<const LineValue>>,
@@ -44,7 +44,7 @@ public:
 		static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& getMonthlyOccurances() const;
 
 	const std::vector<std::vector<std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
-		static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& getMonthlyAverages() const;
+		static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& getmonthlyAvgSnglTrnsct() const;
 
 	const std::vector<size_t> getYearMonthAmounts();
 
@@ -89,10 +89,10 @@ private:
 				std::array<
 					std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
 					static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>,
-					static_cast<int>(Currency::maxCurrencies)>>> monthlyAverages = { {{{{}}}} }; // Average singular transaction per type
+					static_cast<int>(Currency::maxCurrencies)>>> monthlyAvgSnglTrnsct = { {{{{}}}} }; // Average singular transaction per type
 
 
-	const std::vector<std::reference_wrapper<LineValue>> processStatement(int newOrRefresh = 0);
+	void processStatement(const std::vector<std::reference_wrapper<LineValue>> expenses, int newOrRefresh = 0);
 	size_t returnTotalIndex();
 	void determineItemType(const LineValue& expense, const size_t monthIdx, const size_t yearIdx, int newOrRefresh = 0);
 	void checkArrays(const std::vector<std::reference_wrapper<LineValue>> expenses);
