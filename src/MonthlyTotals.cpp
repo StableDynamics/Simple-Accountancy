@@ -66,10 +66,11 @@ const std::vector<std::vector<std::array<std::array<std::array<double, static_ca
 	return monthlyAvgSnglTrnsct;
 }
 
-const std::vector<size_t> MonthlyTotals::getYearMonthAmounts() {
-	std::vector<size_t> yearMonth;
-	for (auto val : monthsContained)
-		yearMonth.push_back(static_cast<size_t>(val.size()));
+const std::array<int, 2> MonthlyTotals::getYearMonthAmounts() {
+	std::array<int, 2> yearMonth = {};
+	for (auto val : monthsContained) {
+		yearMonth[0] += 1; yearMonth[1] += static_cast<int>(val.size());
+	}
 	
 	return yearMonth;
 }

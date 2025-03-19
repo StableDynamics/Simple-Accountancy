@@ -46,7 +46,7 @@ public:
 	const std::vector<std::vector<std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
 		static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& getmonthlyAvgSnglTrnsct() const;
 
-	const std::vector<size_t> getYearMonthAmounts();
+	const std::array<int, 2> getYearMonthAmounts();
 
 	// Overloaded operators
 	MonthlyTotals& operator=(MonthlyTotals other);

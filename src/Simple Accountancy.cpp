@@ -52,6 +52,7 @@ int main(int argc, char* argv[])
         try
         {
             temp = BankStatement(fname);
+            temp.printStatementSummary();
 
             bankStatementsVec.push_back(temp);
             

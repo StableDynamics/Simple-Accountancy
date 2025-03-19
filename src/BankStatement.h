@@ -16,6 +16,13 @@
 #include <stdexcept>
 #include <algorithm>
 #include <iterator>
+#include <iomanip>
+
+#ifdef _WIN32
+#include <Windows.h>
+#include <cstdio>
+#endif
+
 
 #include "AccountingPeriod.h"
 #include "MonthlyTotals.h"
@@ -41,12 +48,17 @@ public:
 	BankStatement();
 	BankStatement(const std::string& fname);
 	virtual ~BankStatement();
+	BankStatement(const BankStatement& other) = default; // Copy constructor
 	// Maybe add copy constructor and assignment operator here?
-	void printSummary();
+	void printStatementSummary(int strLen = 0);
 
 private:
-	// Stores monthly averages arranged by income or expense
-	std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>, 2> avgByType = {};
+	// Stores monthly averages arranged by currency, and then income or expense, and then individual array values are ItemTypes
+	// currency.incomeOrExpense.type
+	// Type explained below:
+	// 0 - maxItemTypes = totals according to ItemType enum
+	// end = Totals
+	std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>, static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)> avgByType = { {{}} };
 
 	void calculateAvg();
 
