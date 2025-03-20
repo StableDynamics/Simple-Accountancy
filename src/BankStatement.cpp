@@ -8,21 +8,6 @@
 #include "BankStatement.h"
 
 #include <vector>
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include <stdexcept>
-#include <algorithm>
-#include <iterator>
-#include <iomanip>
-
-#include "AccountingPeriod.h"
-#include "BankFileImporter.h"
-#include "HelpfulFunctions.h"
-#include "LineValue.h"
-#include "BankName.h"
-#include "Month.h"
-#include "ItemTypeDiscriminator.h"
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 * Public functions
@@ -75,4 +60,12 @@ void BankStatement::calculateAvg(){
 		for (auto& itemTypes : currency)
 			for (auto& item : itemTypes)
 				item = item / static_cast<double>(totalMonths);
+
+	// Calculate average Income vs Expenditure
+	size_t curr{ 0 };
+	for (auto& total : avgIncVsExp)
+	{
+		total = avgByType[curr][static_cast<size_t>(IncomeOrExpense::Income)].back() - avgByType[curr][static_cast<size_t>(IncomeOrExpense::Expense)].back();
+		curr += 1;
+	}
 }

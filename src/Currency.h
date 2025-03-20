@@ -37,6 +37,15 @@ namespace Currency
 		"€",
 		"$"
 	};
+
+#ifdef _WIN32 // Needed in order to have Windows consoles display things properly
+	const std::vector<std::u8string> currencySymbolsu8 =
+	{
+		u8"£",
+		u8"€",
+		u8"$"
+	};
+#endif
 }
 
 #endif // !defined(CURRENCY)

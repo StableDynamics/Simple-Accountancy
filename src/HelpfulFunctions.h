@@ -13,6 +13,7 @@
 #include "IncomeOrExpense.h"
 #include "BankName.h"
 #include "ReturnTypeName.h"
+#include "TextConversion.h"
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 * Template Functions
@@ -178,7 +179,11 @@ std::string enumToString(T enumValue, std::string_view wantedStringType)
 		}
 		else if constexpr (std::is_same_v < T, Currency::Currency>)
 		{
+#if _WIN32
+			return u8StrToStr(Currency::currencySymbolsu8[enumValue]);
+#else
 			return static_cast<std::string>(Currency::currencyStringsOther[enumValue]);
+#endif
 		}
 		else if constexpr (std::is_same_v < T, ItemType::ItemType>)
 		{
@@ -229,10 +234,4 @@ void enumErrorCheck(const std::vector<std::string_view>& strings3Len, const std:
 * Forward Declared Functions
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*
-* Allow conversion between u8string and string so that cout can print it to console
-*/
-#if defined(__cpp_lib_char8_t)
-std::string fromu8String(const std::u8string& s);
-#endif
 #endif

@@ -30,7 +30,7 @@ public:
 	virtual ~BankStatement();
 	BankStatement(const BankStatement& other) = default; // Copy constructor
 	// Maybe add copy constructor and assignment operator here?
-	void printStatementSummary(int strLen = 0);
+	void printStatementSummary(int strLen = 0); // Held in BankStatement_WindowsStuff due to the need to convince windows to use UTF8
 
 private:
 	// Stores monthly averages arranged by currency, and then income or expense, and then individual array values are ItemTypes
@@ -39,6 +39,9 @@ private:
 	// 0 - maxItemTypes = totals according to ItemType enum
 	// end = Totals
 	std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>, static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)> avgByType = { {{}} };
+	
+	// Stores values comparing average monthly income to expenses for each currency 
+	std::array<double, static_cast<int>(Currency::maxCurrencies)> avgIncVsExp = {};
 
 	void calculateAvg();
 
