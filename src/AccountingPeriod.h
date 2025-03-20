@@ -10,13 +10,9 @@
 
 #include <string>
 #include <string_view>
-#include <stdexcept>
-#include <iterator>
-#include <sstream>
 
 #include "Month.h"
 #include "LineValue.h"
-#include "HelpfulFunctions.h"
 
 /**
  * Contains the accounting period of the statement contained in the BankStatement

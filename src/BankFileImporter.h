@@ -8,17 +8,13 @@
 #if !defined(BANKFILEIMPORTER)
 #define BANKFILEIMPORTER
 
-#include <string_view>
 #include <vector>
 #include <string>
-#include <fstream>
-#include <stdexcept>
 #include <functional>
 
 #include "AccountingPeriod.h"
 #include "LineValue.h"
-#include "HelpfulFunctions.h"
-#include "ItemTypeDiscriminator.h"
+#include "BankName.h"
 
 /*
 * This class receives a filename and imports it into a series of LineValues based on which bank the statement is from

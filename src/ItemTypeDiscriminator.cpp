@@ -1,5 +1,8 @@
 #include "ItemTypeDiscriminator.h"
 
+#include <string>
+#include "HelpfulFunctions.h"
+
 // Stub is a stub
 ItemType::ItemType determineItemType(const std::string_view description)
 {

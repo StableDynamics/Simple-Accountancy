@@ -9,7 +9,6 @@
 #define MONTHLYTOTALS
 
 #include <vector>
-#include <numeric>
 #include <array>
 #include <functional>
 
@@ -17,7 +16,6 @@
 #include "itemType.h"
 #include "LineValue.h"
 #include "IncomeOrExpense.h"
-#include "HelpfulFunctions.h"
 #include "BankFileImporter.h"
 
 /*

@@ -7,6 +7,10 @@
 
 #include "LineValue.h"
 
+#include <string_view>
+
+#include "HelpfulFunctions.h"
+
 /*
 * Prints a string summary of the LineValue allowing selection of month sizes and currency display
 */

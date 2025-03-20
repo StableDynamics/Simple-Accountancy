@@ -9,13 +9,11 @@
 #define LINEVALUE
 
 #include <string>
-#include <string_view>
 
 #include "Month.h"
 #include "IncomeOrExpense.h"
 #include "ItemType.h"
 #include "Currency.h"
-#include "HelpfulFunctions.h"
 
 /**
  * This struct contains the data from each line of the csv, wondering if this should be a class instead...

@@ -9,33 +9,13 @@
 #define BANKSTATEMENT
 
 #include <string>
-#include <vector>
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include <stdexcept>
-#include <algorithm>
-#include <iterator>
-#include <iomanip>
+#include <array>
 
-#ifdef _WIN32
-#include <Windows.h>
-#include <cstdio>
-#endif
-
-
-#include "AccountingPeriod.h"
 #include "MonthlyTotals.h"
-#include "BankFileImporter.h"
 
-#include "HelpfulFunctions.h"
-#include "LineValue.h"
-#include "BankName.h"
-#include "Month.h"
 #include "Currency.h"
 #include "IncomeOrExpense.h"
 #include "ItemType.h"
-#include "ItemTypeDiscriminator.h"
 
 /**
  * This class inherits from MonthlyTotals and is meant to contain more advanced 

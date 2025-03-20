@@ -1,4 +1,4 @@
-#if !defined(HELPFULFUNCTIONS)
+﻿#if !defined(HELPFULFUNCTIONS)
 #define HELPFULFUNCTIONS
 #include <string>
 #include <stdexcept>
@@ -89,9 +89,6 @@ T enumFromString(const std::string_view enumString)
 		if (found == enumOtherStrings_sv->end()) throw std::runtime_error(err);
 		else return static_cast<T>(index);
 	}
-
-	// Should only get here if the enum is not found so error
-	throw std::runtime_error(err);
 }
 
 template <typename T>
@@ -232,5 +229,10 @@ void enumErrorCheck(const std::vector<std::string_view>& strings3Len, const std:
 * Forward Declared Functions
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+/*
+* Allow conversion between u8string and string so that cout can print it to console
+*/
+#if defined(__cpp_lib_char8_t)
+std::string fromu8String(const std::u8string& s);
+#endif
 #endif

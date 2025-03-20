@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////
 //  BankFileImporter.cpp
 //  Implementation of the Class BankFileImporter
 //  Created on:      11-Mar-2025 22:05:24
@@ -6,6 +6,13 @@
 ///////////////////////////////////////////////////////////
 
 #include "BankFileImporter.h"
+
+#include <string_view>
+#include <fstream>
+#include <stdexcept>
+
+#include "HelpfulFunctions.h"
+#include "ItemTypeDiscriminator.h"
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 * Public functions
@@ -99,7 +106,7 @@ std::vector<std::vector<std::string>> BankFileImporter::importFile(const std::st
 	std::string line, word;
 
 	// Open file using fstream for reading into Internal buffer
-	std::fstream file(fname, std::fstream::in);
+	std::ifstream file(fname, std::ifstream::in);
 	// Check to see if the file is open
 	if (file.is_open())
 	{
@@ -190,7 +197,7 @@ void BankFileImporter::nationwideUKProcessing(const std::vector<std::vector<std:
 	{
 	case BankName::Nationwide_UK_2024:
 		// Data starts on line 6 from Nationwide csvs
-		startLine = 6;
+		startLine = 5;
 
 		// Loop through the content and create LineValue objects
 		// would be nice to take the column row from the csv and match it up

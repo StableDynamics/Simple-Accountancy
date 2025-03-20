@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////
+ï»¿///////////////////////////////////////////////////////////
 //  Currency.h
 //  Implementation of the Enumeration Currency
 //  Created on:      05-Mar-2025 16:18:42
@@ -33,8 +33,8 @@ namespace Currency
 
 	const std::vector<std::string_view> currencyStringsOther =
 	{
-		"£",
-		"€",
+		"Â£",
+		"â‚¬",
 		"$"
 	};
 }
