@@ -8,12 +8,32 @@
 #if !defined(INCOMEOREXPENSE)
 #define INCOMEOREXPENSE
 
+#include <vector>
+#include <string_view>
+
 /**
  * is it an income or an expense?
  */
-enum IncomeOrExpense
+namespace IncomeOrExpense
 {
-	Income,
-	Expense
-};
+	enum IncomeOrExpense
+	{
+		Income,
+		Expense,
+		maxIncomeOrExpense
+	};
+
+	const std::vector<std::string_view> incomeOrExpenseStrings3Len =
+	{
+		"Inc",
+		"Exp"
+	};
+
+	const std::vector<std::string_view> incomeOrExpenseStringsOther =
+	{
+		"Income",
+		"Expense"
+	};
+}
+
 #endif // !defined(INCOMEOREXPENSE)

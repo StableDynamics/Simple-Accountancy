@@ -436,3 +436,6 @@ FodyWeavers.xsd
 *.sln
 *.vcxproj
 *.vcxproj.filters
+
+# csvs
+*.csv
