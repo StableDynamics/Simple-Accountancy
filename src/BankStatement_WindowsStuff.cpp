@@ -13,7 +13,6 @@
 #include <Windows.h>
 #include <string_view>
 #include "TextConversion.h"
-//#include <cstdio>
 #endif
 
 /**

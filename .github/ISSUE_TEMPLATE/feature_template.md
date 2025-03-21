@@ -9,7 +9,7 @@ type: feature
 
 ---
 
-| Field Name             | Field Description                       |
+| Field Name             | Field Description                  |
 | :--------------------- | :--------------------------------- |
-| Description             |                                                  |
-| Definition of Done  |                                                  |
+| Description            |                                    |
+| Definition of Done     |                                    |
