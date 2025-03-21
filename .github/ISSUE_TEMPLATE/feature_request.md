@@ -4,7 +4,7 @@ about: This template provides a default setup for a feature request for the proj
 title: 'FEATURE REQUEST: '
 labels: ''
 assignees: ''
-type: feature_request
+type: feature request
 
 ---
 

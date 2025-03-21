@@ -4,7 +4,7 @@ about: This template provides a default setup for a bug report for the project t
 title: 'BUG REPORT: '
 labels: ''
 assignees: ''
-type: bug_report
+type: bug
 
 ---
 Please fill in as much as you can
