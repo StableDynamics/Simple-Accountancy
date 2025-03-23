@@ -8,8 +8,8 @@
 #if !defined(BANKNAME)
 #define BANKNAME
 
-#include <vector>
 #include <string_view>
+#include <vector>
 
 /*
  * What bank is the statement from?

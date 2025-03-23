@@ -1,6 +1,5 @@
 #include "ItemTypeDiscriminator.h"
 
-#include <string>
 #include "HelpfulFunctions.h"
 
 // Stub is a stub

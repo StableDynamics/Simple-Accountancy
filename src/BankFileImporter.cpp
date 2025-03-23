@@ -7,12 +7,17 @@
 
 #include "BankFileImporter.h"
 
-#include <string_view>
 #include <fstream>
 #include <stdexcept>
+#include <string_view>
+#include <type_traits>
+#include <utility>
 
+#include "Currency.h"
 #include "HelpfulFunctions.h"
+#include "IncomeOrExpense.h"
 #include "ItemTypeDiscriminator.h"
+#include "Month.h"
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 * Public functions
@@ -63,6 +68,11 @@ const std::string BankFileImporter::getBankName() const {
 }
 
 
+const std::string_view BankFileImporter::getAccountName() const {
+	return accountName;
+}
+
+
 const std::vector<std::reference_wrapper<LineValue>> BankFileImporter::getRawExpRef() const {
 	return rawExpensesRef;
 }
@@ -102,29 +112,55 @@ void swap(BankFileImporter& first, BankFileImporter& second) {
 */
 std::vector<std::vector<std::string>> BankFileImporter::importFile(const std::string& fname){
 	std::vector<std::vector<std::string>> content;
-	std::vector<std::string> row;
-	std::string line, word;
 
 	// Open file using fstream for reading into Internal buffer
 	std::ifstream file(fname, std::ifstream::in);
 	// Check to see if the file is open
 	if (file.is_open())
 	{
+		// Define reference variables
+		std::vector<std::string> row;
+		std::string line, word;
+		std::stringstream strStream;
+		std::stringstream wordStream; // If anything has a comma in it as part of the text this stream accounts for that
+
 		// While there are lines to get from the file it will build up 'content' with the line 
 		// data from the csv file
 		while (std::getline(file, line))
 		{
 			// Row variable holds each row from the file temporarily, clear it to start
 			row.clear();
-			std::stringstream str(line);
+			strStream.str(line);
 
-			while (std::getline(str, word, ','))
+			while (std::getline(strStream, word, ','))
 			{
-				// Add each word to the row
-				row.push_back(word);
+				if (word.back() == '\"')
+				{
+					if (wordStream.rdbuf()->in_avail() > 0)
+					{
+						// Add compound word
+						wordStream << word;
+						row.emplace_back(wordStream.str());
+
+						// Clear the stream
+						wordStream.str(std::string());;	wordStream.clear();
+					}
+					else
+					{
+						// Add each word to the row
+						row.emplace_back(word);
+					}
+				}
+				else
+				{
+					// Add it to the stream
+					wordStream << word;
+				}
+				
 			}
-			// Add the row to content
-			content.push_back(row);
+			// Add the row to content, and reset strStream
+			content.emplace_back(row);
+			strStream.str(std::string()); strStream.clear();
 		}
 
 		// Close the file
@@ -196,8 +232,11 @@ void BankFileImporter::nationwideUKProcessing(const std::vector<std::vector<std:
 	switch (bankName)
 	{
 	case BankName::Nationwide_UK_2024:
-		// Data starts on line 6 from Nationwide csvs
+		// Using zero based indexing - data starts on line 5 from Nationwide csvs
 		startLine = 5;
+
+		// Account name for Nationwide is on line 0, element 1
+		accountName = content[0][1].substr(1, content[0][1].size() - 2);
 
 		// Loop through the content and create LineValue objects
 		// would be nice to take the column row from the csv and match it up
@@ -205,7 +244,7 @@ void BankFileImporter::nationwideUKProcessing(const std::vector<std::vector<std:
 		// 0 - Date
 		// 1 - Transaction Type
 		// 2 - Description
-		// 3 - Piad Out
+		// 3 - Paid Out
 		// 4 - Paid In
 		// 5 - Balance
 		for (size_t i = startLine; i < content.size(); i++)

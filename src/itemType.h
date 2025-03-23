@@ -8,8 +8,8 @@
 #if !defined(ITEMTYPE)
 #define ITEMTYPE
 
-#include <vector>
 #include <string_view>
+#include <vector>
 
 /**
  * What type of item is it?
@@ -26,7 +26,9 @@ namespace ItemType
 		Rent,
 		Bills,
 		Bank_Fees,
-		Groceries,
+		Savings,
+		Interest,
+		Shopping,
 		Insurance,
 		Subscriptions,
 		Entertainment,
@@ -43,7 +45,9 @@ namespace ItemType
 		"Ren",
 		"Bil",
 		"Ban",
-		"Gro",
+		"Sav",
+		"Int",
+		"Sho",
 		"Ins",
 		"Sub",
 		"Ent"
@@ -59,7 +63,9 @@ namespace ItemType
 		"Rent",
 		"Bills",
 		"Bank Fees",
-		"Groceries",
+		"Savings",
+		"Interest",
+		"Shopping",
 		"Insurance",
 		"Subscriptions",
 		"Entertainment"

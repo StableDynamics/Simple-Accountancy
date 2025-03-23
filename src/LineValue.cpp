@@ -7,8 +7,6 @@
 
 #include "LineValue.h"
 
-#include <string_view>
-
 #include "HelpfulFunctions.h"
 
 /*

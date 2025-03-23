@@ -10,9 +10,10 @@
 
 #include <string>
 #include <string_view>
+#include <vector>
 
-#include "Month.h"
 #include "LineValue.h"
+#include "Month.h"
 
 /**
  * Contains the accounting period of the statement contained in the BankStatement

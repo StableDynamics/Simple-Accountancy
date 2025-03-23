@@ -8,13 +8,13 @@
 #if !defined(BANKFILEIMPORTER)
 #define BANKFILEIMPORTER
 
-#include <vector>
-#include <string>
 #include <functional>
+#include <string>
+#include <vector>
 
 #include "AccountingPeriod.h"
-#include "LineValue.h"
 #include "BankName.h"
+#include "LineValue.h"
 
 /*
 * This class receives a filename and imports it into a series of LineValues based on which bank the statement is from
@@ -30,6 +30,7 @@ public:
 	BankFileImporter(BankFileImporter&& other) noexcept; // Move constructor
 
 	const std::string getBankName() const;
+	const std::string_view getAccountName() const;
 	const std::vector<std::reference_wrapper<LineValue>> getRawExpRef() const;
 	const AccountingPeriod& getAccountingPeriod() const;
 
@@ -41,6 +42,7 @@ public:
 
 private:
 	BankName::BankName bankName{ BankName::maxBanks };
+	std::string accountName = "Current Account"; // Default is that it is a current account
 	std::vector<LineValue> rawExpenses = {};
 	std::vector<std::reference_wrapper<LineValue>> rawExpensesRef = {};
 	AccountingPeriod accountingPeriod;

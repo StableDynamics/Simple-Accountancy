@@ -1,5 +1,8 @@
 #include "TextConversion.h"
 
+#include <cstdlib>
+#include <wchar.h>
+
 /*
 * Allow conversion between u8string and string so that cout can print it to console
 * Did have the Vec converters as a lambda within BankStatement_WindowsStuff but thought they would be more useful here
@@ -23,3 +26,46 @@ const std::vector<std::string> u8StrvVecToStrVec(const std::vector<std::u8string
     return strvConv;
 }
 #endif
+
+// String conversion functions
+std::string wc_tToString(const wchar_t* wstr) {
+    size_t wstrSz = wcslen(wstr) + 1; // Work out length of string with a +1 for null character
+    size_t convertedChars = 0;
+
+    // Allocate two bytes for each character for multi-byte string
+    const size_t chSz = wstrSz * 2;
+
+    char* newChar{ new char[chSz] }; // eugh
+
+    // Copy across the wstr to newChar
+    wcstombs_s(&convertedChars, newChar, chSz, wstr, _TRUNCATE);
+
+    // Convert to string
+    std::string convString{ newChar };
+
+    // Delete pointer
+    delete[]newChar;
+
+    return convString;
+}
+
+
+std::string wstringToString(const std::wstring wstr) {
+    size_t convertedChars = 0;
+
+    // Allocate two bytes for each character for multi-byte string
+    const size_t chSz = (wstr.size() + 1) * 2;
+
+    char* newChar{ new char[chSz]}; // eugh
+
+    // Copy across the wstr to newChar
+    wcstombs_s(&convertedChars, newChar, chSz, wstr.c_str(), _TRUNCATE);
+
+    // Convert to string
+    std::string convString{ newChar };
+
+    // Delete pointer
+    delete[]newChar;
+
+    return convString;
+}

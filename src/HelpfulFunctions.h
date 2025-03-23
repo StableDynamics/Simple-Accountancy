@@ -1,17 +1,18 @@
 ﻿#if !defined(HELPFULFUNCTIONS)
 #define HELPFULFUNCTIONS
-#include <string>
-#include <stdexcept>
-#include <sstream>
-#include <vector>
-#include <string_view>
 #include <memory>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <string_view>
+#include <type_traits>
+#include <vector>
 
-#include "Month.h"
-#include "Currency.h"
-#include "ItemType.h"
-#include "IncomeOrExpense.h"
 #include "BankName.h"
+#include "Currency.h"
+#include "IncomeOrExpense.h"
+#include "ItemType.h"
+#include "Month.h"
 #include "ReturnTypeName.h"
 #include "TextConversion.h"
 
