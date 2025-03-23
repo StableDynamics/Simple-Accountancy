@@ -9,11 +9,14 @@ This is a simple console based application aimed at aiding a normal person get a
 - Supported Banks by Country:
     - UK
         - Nationwide
-- Average monthly spends across period organised by category
-- Average monthly income vs expenses over period
+- Supported OSs:
+    - Windows 11
+- Analysis Functions:
+    - Average monthly spends across period organised by category
+    - Average monthly income vs expenses over period
 
 ## Usage
-No installer provided yet, code is developed within MSVS using C++20 in WIndows. Behaviour/success on other platforms is currently untested (would love to know though!).
+No installer provided yet, code is developed within MSVS using C++20 in Windows 11. Behaviour/success on other platforms is currently untested (would love to know though!).
 
 Requires the following additional Microsoft libraries to be installed and linked:
 - propsys.lib
