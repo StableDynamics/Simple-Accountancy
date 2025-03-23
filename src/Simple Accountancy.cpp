@@ -1,36 +1,54 @@
 ﻿
+#include <exception>
 #include <iostream>
 #include <string>
+#include <vector>
+
+#include "BankName.h"
 #include "BankStatement.h"
+#include "Currency.h"
 #include "HelpfulFunctions.h"
-#include "ItemType.h"
 #include "IncomeOrExpense.h"
-#include "BankFileImporter.h"
-#include "MonthlyTotals.h"
+#include "ItemType.h"
+#include "Month.h"
 
-//#include <Windows.h>
+#ifdef _WIN32
+#pragma warning(disable : 4091) // Windows.h contains a typedef for a struct called CURRENCY within the oaidl.h file which conflicts with the enum CURRENCY and its macro and it throws a C4091 warning
+#include "Windows_SelectFiles.h"
+#endif // _WIN32
 
-//inline std::ostream& operator<<(std::ostream& os, const char8_t* str) {
-//    return os << reinterpret_cast<const char*>(str);
-//}
 
 int main(int argc, char* argv[])
 {
-    
-    ////std::locale::global(std::locale("en_GB.UTF-8")); // Set locale globally to UTF-8
+    // Program takes in the filename at launch in the format of "path\filename.csv" or through a user selection
+    std::vector<std::string> filePathVec;
 
-    
-
-
-    // Program takes in the filename at launch in the format of "path\filename.csv"
-    // Would be good to replace this with a file search if an argument has not been sipplied
-    // Longer term would be to replace all of this with a GUI that allowed users to tailer analyses and compare results....
     // Error check inputs
-    if (argc < 2)
+    if (argc < 3)
     {
+#ifdef _WIN32
+        // Open file explorer
+        try
+        {
+            filePathVec = getCSV();
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+            return -1;
+        }
+#else
         std::cerr << "Program has not been supplied enough arguments. Have you given it the location"
             " of a file?" << std::endl;
         return -1;
+#endif
+    }
+    else
+    {
+        for (size_t i = 1; i < argc; i++)
+        {
+            filePathVec.emplace_back(argv[i]);
+        }
     }
 
     // Error check enums - more of a development thing...
@@ -50,12 +68,11 @@ int main(int argc, char* argv[])
 	
 	// Create vectors of class objects
 	std::vector<BankStatement> bankStatementsVec;
+    int idx{ 0 };
 
     // Loop through all the files that were supplied
-    for (size_t i = 1; i < argc; i++)
+    for (auto fname : filePathVec)
     {
-        std::string fname{ argv[i] };
-
         // Create class objects for supplied file
         try
         {
@@ -70,7 +87,8 @@ int main(int argc, char* argv[])
         }
 
         // Print Summary
-        bankStatementsVec[i - 1].printStatementSummary();
+        bankStatementsVec[idx].printStatementSummary();
+        idx += 1;
     }
 
     std::cout << "Finished processing all files" << std::endl << std::endl;

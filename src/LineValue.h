@@ -10,10 +10,10 @@
 
 #include <string>
 
-#include "Month.h"
+#include "Currency.h"
 #include "IncomeOrExpense.h"
 #include "ItemType.h"
-#include "Currency.h"
+#include "Month.h"
 
 /**
  * This struct contains the data from each line of the csv, wondering if this should be a class instead...

@@ -8,8 +8,8 @@
 #if !defined(BANKSTATEMENT)
 #define BANKSTATEMENT
 
-#include <string>
 #include <array>
+#include <string>
 
 #include "MonthlyTotals.h"
 

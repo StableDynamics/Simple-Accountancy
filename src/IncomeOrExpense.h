@@ -8,8 +8,8 @@
 #if !defined(INCOMEOREXPENSE)
 #define INCOMEOREXPENSE
 
-#include <vector>
 #include <string_view>
+#include <vector>
 
 /**
  * is it an income or an expense?

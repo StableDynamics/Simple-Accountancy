@@ -8,8 +8,9 @@
 #if !defined(CURRENCY)
 #define CURRENCY
 
-#include <vector>
+#include <string>
 #include <string_view>
+#include <vector>
 
 /**
  * What currency is it?

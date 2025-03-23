@@ -8,8 +8,8 @@
 #if !defined(MONTH)
 #define MONTH
 
-#include <vector>
 #include <string_view>
+#include <vector>
 
 /**
  * What month is it?

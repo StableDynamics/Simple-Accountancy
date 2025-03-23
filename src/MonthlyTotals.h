@@ -8,15 +8,18 @@
 #if !defined(MONTHLYTOTALS)
 #define MONTHLYTOTALS
 
-#include <vector>
 #include <array>
+#include <cstdint>
 #include <functional>
+#include <string>
+#include <vector>
 
-#include "Month.h"
+#include "BankFileImporter.h"
+#include "Currency.h"
+#include "IncomeOrExpense.h"
 #include "itemType.h"
 #include "LineValue.h"
-#include "IncomeOrExpense.h"
-#include "BankFileImporter.h"
+#include "Month.h"
 
 /*
 * This class inherits the data from BankFileImporter and then processes the data to work out totals and averages per month per year
