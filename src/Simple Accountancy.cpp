@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
     std::vector<std::string> filePathVec;
 
     // Error check inputs
-    if (argc < 3)
+    if (argc < 2)
     {
 #ifdef _WIN32
         // Open file explorer
