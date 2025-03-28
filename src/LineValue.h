@@ -25,8 +25,8 @@ struct LineValue
 	int year{ 0 };												// Year of the transaction
 	Month::Month month{ Month::maxMonths };						// Month of the transaction
 	int day{ 0 };												// Day of the transaction
-	std::string transactType{ "" };								// Type of transaction
-	std::string description{ "" };								// Description of the transaction
+	std::string transactType{};									// Type of transaction
+	std::string description{};									// Description of the transaction
 	Currency::Currency currency{ Currency::maxCurrencies };		// Currency of the transaction
 	double paidIn{ 0.0 };										// Amount paid in
 	double paidOut{ 0.0 };										// Amount paid out
@@ -34,6 +34,7 @@ struct LineValue
 	IncomeOrExpense::IncomeOrExpense incomeOrExpense
 	{ IncomeOrExpense::maxIncomeOrExpense };					// Is it an income or an expense
 	ItemType::ItemType itemType{ ItemType::maxItemTypes };		// What type of item is it?
+	std::string subType{};										// User defined sub-type
 
 	std::string lineValueSummary(int threeOrOtherMonth, 
 		int threeOrOtherCurrency) const;						// Prints summary of this LineValue
