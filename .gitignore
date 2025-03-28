@@ -439,3 +439,6 @@ FodyWeavers.xsd
 
 # csvs
 *.csv
+
+# Exclude the discriminator config file
+ItemTypeList.json
