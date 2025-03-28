@@ -21,7 +21,7 @@
 
 int main(int argc, char* argv[])
 {    
-    // Access the singleton instance
+    // Access the singleton instance of config data
     GlobalDiscriminatorConfiguration& globalDiscriminatorConfiguration = GlobalDiscriminatorConfiguration::getInstance();
 
     // Program takes in the filename at launch in the format of "path\filename.csv" or through a user selection

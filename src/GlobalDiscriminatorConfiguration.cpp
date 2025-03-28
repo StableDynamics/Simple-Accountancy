@@ -20,11 +20,35 @@ void GlobalDiscriminatorConfiguration::impl::load(const std::string& fname)
     std::ifstream file(fname, std::ifstream::in);
     if (!file.is_open())
     {
-        // Create default JSON object
-        json config;
+        json tempData = {
+            {"Other",
+                {"Your Item Type Description", "Your Item Sub-Type"},
+                {"Your Item Type Description", "Your Item Sub-Type"}
+            },
+            {"Salary",
+                {"Your Item Type Description", "Your Item Sub-Type"}
+            }
+        };
 
-        for (auto itemType : ItemType::itemTypeStringsOther)
-            config.emplace_back(itemType);
+        /*json tempData;
+        tempData.push_back({ "test" });*/
+
+        std::ofstream file("testdata.json");
+        file << tempData;
+        file.flush();
+        file.close();
+
+        //for (auto itemType : ItemType::itemTypeStringsOther)
+        //{
+        //    // Top Level Item Type
+        //    configData.emplace_back(std::string(itemType));
+        //    //configData[0].emplace_back("Your Item Type Description", "Your Item Sub-Type");
+        //}
+
+        //std::ofstream file2("testItems.json");
+        //file2 << configData;
+        //file2.flush();
+        //file2.close();
     }
     else
     {
@@ -52,6 +76,9 @@ GlobalDiscriminatorConfiguration::GlobalDiscriminatorConfiguration()
 {
     // record number of source files which instanciate a GlobalDiscriminatorConfiguration
     ++initCount;
+
+    // Load config file
+    this->load();
 }
 
 GlobalDiscriminatorConfiguration::~GlobalDiscriminatorConfiguration()

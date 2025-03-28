@@ -19,11 +19,11 @@ public:
     GlobalDiscriminatorConfiguration(const GlobalDiscriminatorConfiguration&) = delete;
     GlobalDiscriminatorConfiguration& operator=(const GlobalDiscriminatorConfiguration&) = delete;
 
-
-    // (re)load global state    
-    void load();
-
     // public parameter accessor
+    const nlohmann::json& getConfigData() const
+    {
+        return getImpl().getConfigData();
+    }
 
 private:
     GlobalDiscriminatorConfiguration();
@@ -35,11 +35,17 @@ private:
     {
         void load(const std::string& fname);
 
-        // int get_param_a() const; need to add in get data functions from configData
+        const nlohmann::json& getConfigData() const
+        {
+            return configData;
+        }
 
         nlohmann::json configData;
     };
 
+
+    // Load global state    
+    void load();
     static int initCount;
     static impl* pimpl;
     static impl& getImpl()
