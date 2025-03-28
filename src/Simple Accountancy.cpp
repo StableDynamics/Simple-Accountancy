@@ -7,6 +7,7 @@
 #include "BankName.h"
 #include "BankStatement.h"
 #include "Currency.h"
+#include "GlobalDiscriminatorConfiguration.h"
 #include "HelpfulFunctions.h"
 #include "IncomeOrExpense.h"
 #include "ItemType.h"
@@ -19,7 +20,17 @@
 
 
 int main(int argc, char* argv[])
-{
+{    
+    try
+    {
+        // Access the singleton instance of config data
+        globalDiscriminatorConfiguration.load();
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+        return -1;
+    }
     // Program takes in the filename at launch in the format of "path\filename.csv" or through a user selection
     std::vector<std::string> filePathVec;
 
