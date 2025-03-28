@@ -12,7 +12,3 @@
 */
 ItemType::ItemType determineItemType(const std::string_view description);
 
-/*
-* Checks to see if a file is present, if not creates a basic example in the working directory
-*/
-void jsonFilePresent();

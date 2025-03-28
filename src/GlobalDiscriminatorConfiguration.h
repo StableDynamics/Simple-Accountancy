@@ -8,6 +8,10 @@
 class GlobalDiscriminatorConfiguration
 {
 public:
+    GlobalDiscriminatorConfiguration();
+
+    ~GlobalDiscriminatorConfiguration();
+
     // Static method to get the instance of the class
     static GlobalDiscriminatorConfiguration& getInstance()
     {
@@ -19,6 +23,9 @@ public:
     GlobalDiscriminatorConfiguration(const GlobalDiscriminatorConfiguration&) = delete;
     GlobalDiscriminatorConfiguration& operator=(const GlobalDiscriminatorConfiguration&) = delete;
 
+    // Load global state    
+    void load();
+
     // public parameter accessor
     const nlohmann::json& getConfigData() const
     {
@@ -26,10 +33,6 @@ public:
     }
 
 private:
-    GlobalDiscriminatorConfiguration();
-
-    ~GlobalDiscriminatorConfiguration();
-
     // internal implementation   
     struct impl
     {
@@ -40,12 +43,11 @@ private:
             return configData;
         }
 
+        void writeToFile(const std::string& fname);
+
         nlohmann::json configData;
     };
-
-
-    // Load global state    
-    void load();
+    
     static int initCount;
     static impl* pimpl;
     static impl& getImpl()
@@ -53,3 +55,5 @@ private:
         return *pimpl;
     }
 };
+
+static GlobalDiscriminatorConfiguration globalDiscriminatorConfiguration;

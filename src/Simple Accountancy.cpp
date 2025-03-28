@@ -21,9 +21,16 @@
 
 int main(int argc, char* argv[])
 {    
-    // Access the singleton instance of config data
-    GlobalDiscriminatorConfiguration& globalDiscriminatorConfiguration = GlobalDiscriminatorConfiguration::getInstance();
-
+    try
+    {
+        // Access the singleton instance of config data
+        globalDiscriminatorConfiguration.load();
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+        return -1;
+    }
     // Program takes in the filename at launch in the format of "path\filename.csv" or through a user selection
     std::vector<std::string> filePathVec;
 
