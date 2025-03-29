@@ -12,7 +12,8 @@ This is a simple console based application aimed at aiding a normal person get a
 - Supported OSs:
     - Windows 11
 - Analysis Functions:
-    - Average monthly spends across period organised by category
+    - Average monthly spends across period organised by user defined categories
+        - Categories defined in JSON file ItemTypeList.json located in executables folder
     - Average monthly income vs expenses over period
 
 ## Usage
