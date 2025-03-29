@@ -131,7 +131,7 @@ T enumFromString(const std::string_view enumString, size_t index, const std::str
 * Convert an enum to a string
 */
 template <typename T>
-std::string enumToString(T enumValue, std::string_view wantedStringType)
+std::string enumToString(T enumValue, std::string_view wantedStringType = "Other")
 {
 	static_assert(std::is_enum_v<T>); // Must be an enum
 

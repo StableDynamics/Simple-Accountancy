@@ -1,7 +1,9 @@
 #pragma once
 
+#include <array>
 #include <string>
 
+#include "IncomeOrExpense.h"
 #include "json.hpp"
 
 // This class contains the configuration data for the itemtypediscriminator
@@ -32,6 +34,12 @@ public:
         return getImpl().getConfigData();
     }
 
+    // Return accepted iOrE values
+    std::array <std::string, (static_cast<int>(IncomeOrExpense::maxIncomeOrExpense) + 1)> getIorEVal() const
+    {
+        return accptdIorEVals;
+    }
+
 private:
     // internal implementation   
     struct impl
@@ -48,6 +56,8 @@ private:
         nlohmann::json configData;
     };
     
+
+    static std::array <std::string, (static_cast<int>(IncomeOrExpense::maxIncomeOrExpense) + 1)> accptdIorEVals;
     static int initCount;
     static impl* pimpl;
     static impl& getImpl()

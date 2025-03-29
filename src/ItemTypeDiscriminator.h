@@ -1,8 +1,6 @@
 #pragma once
 
-#include <string_view>
-
-#include "ItemType.h"
+#include "LineValue.h"
 
 /*
 * The ItemTypeDiscriminator will work out the type of the bank statement line item be nice if it 
@@ -10,5 +8,5 @@
 *
 * Currently it is just a stub
 */
-ItemType::ItemType determineItemType(const std::string_view description);
+void determineItemType(LineValue& lineVal);
 

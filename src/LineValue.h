@@ -8,6 +8,7 @@
 #if !defined(LINEVALUE)
 #define LINEVALUE
 
+#include <array>
 #include <string>
 
 #include "Currency.h"
@@ -34,7 +35,10 @@ struct LineValue
 	IncomeOrExpense::IncomeOrExpense incomeOrExpense
 	{ IncomeOrExpense::maxIncomeOrExpense };					// Is it an income or an expense
 	ItemType::ItemType itemType{ ItemType::maxItemTypes };		// What type of item is it?
+	std::array<int, static_cast<int>(ItemType::maxItemTypes)> 
+		catResult{};											// Contains the categorisation results
 	std::string subType{};										// User defined sub-type
+	std::vector<std::string> subTypeVals{};						// Vector of the sub-type results
 
 	std::string lineValueSummary(int threeOrOtherMonth, 
 		int threeOrOtherCurrency) const;						// Prints summary of this LineValue

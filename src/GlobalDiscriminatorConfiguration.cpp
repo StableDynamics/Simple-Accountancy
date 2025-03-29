@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 
 #include "ItemType.h"
@@ -11,6 +12,7 @@ using json = nlohmann::json;
 // Default values
 int GlobalDiscriminatorConfiguration::initCount;
 GlobalDiscriminatorConfiguration::impl* GlobalDiscriminatorConfiguration::pimpl;
+std::array <std::string, (static_cast<int>(IncomeOrExpense::maxIncomeOrExpense) + 1)> GlobalDiscriminatorConfiguration::accptdIorEVals;
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 * Public functions
@@ -20,6 +22,18 @@ GlobalDiscriminatorConfiguration::GlobalDiscriminatorConfiguration()
 {
     // record number of source files which instanciate a GlobalDiscriminatorConfiguration
     ++initCount;
+
+    // Set accepted IorE values if not set already
+    if (accptdIorEVals[0] == "")
+    {
+        size_t idx = 0;
+        for (auto iOrE : IncomeOrExpense::incomeOrExpenseStringsOther)
+        {
+            accptdIorEVals[idx] = std::string(iOrE);
+            idx += 1;
+        }
+        accptdIorEVals[idx] = "Income or Expense";
+    }
 }
 
 GlobalDiscriminatorConfiguration::~GlobalDiscriminatorConfiguration()
@@ -88,6 +102,7 @@ void GlobalDiscriminatorConfiguration::load()
     pimpl->load(fname);
 }
 
+
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 * Private functions
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,10 +111,8 @@ void GlobalDiscriminatorConfiguration::impl::writeToFile(const std::string& fnam
     for (auto itemType : ItemType::itemTypeStringsOther)
     {
         // Top Level Item Type
-        configData[std::string(itemType)] = {
-            {"Your Item Type Description", "Your Item Sub-Type"},
-            {"Your Other Item Type Description", "Your Item Sub-Type"}
-        };
+        configData[std::string(itemType)] = {{ "Your Item Type Description", accptdIorEVals.back(), "Your Item Sub-Type"},
+        { "Your Other Item Type Description", accptdIorEVals.back(), "Your Item Sub-Type" }};
     }
 
     std::ofstream file(fname);
