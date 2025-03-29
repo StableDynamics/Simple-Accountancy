@@ -27,5 +27,5 @@ Requires the following additional Microsoft libraries to be installed and linked
 If you have any suggestions or find any bugs (especially to do with other compilers/OSs, etc.) please use the 'Feature Request' or 'Bug Report' templates when creating a [new issue](https://github.com/StableDynamics/Simple-Accountancy/issues).
 
 ## Acknowledgements
-This repo reproduces aspects of the Microsoft Windows Common Item Dialog Samples - https://github.com/microsoft/Windows-classic-samples
+This repo reproduces aspects of the Microsoft Windows Common Item Dialog Samples - https://github.com/microsoft/Windows-classic-samples  
 This repo uses code from nlohmann-json - https://github.com/nlohmann/json
