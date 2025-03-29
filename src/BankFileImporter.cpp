@@ -281,7 +281,7 @@ void BankFileImporter::nationwideUKProcessing(const std::vector<std::vector<std:
 				lineValue.balance = std::stod(content[i][5].substr(2, content[i][5].size() - 3));
 
 			// This is where a discrimiator would sit in order to determine the line item type
-			lineValue.itemType = determineItemType(lineValue.description);
+			determineItemType(lineValue);
 
 			// Push lineValue back into the expenses vector
 			rawExpenses.push_back(lineValue);
