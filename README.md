@@ -28,3 +28,4 @@ If you have any suggestions or find any bugs (especially to do with other compil
 
 ## Acknowledgements
 This repo reproduces aspects of the Microsoft Windows Common Item Dialog Samples - https://github.com/microsoft/Windows-classic-samples
+This repo uses code from nlohmann-json - https://github.com/nlohmann/json
