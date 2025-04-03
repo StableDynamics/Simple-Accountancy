@@ -235,4 +235,7 @@ void enumErrorCheck(const std::vector<std::string_view>& strings3Len, const std:
 * Forward Declared Functions
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Most occurred string
+std::string mostOccurredString(const std::vector<std::string>& stringVec);
+
 #endif

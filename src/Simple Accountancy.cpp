@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
 {    
     try
     {
-        // Access the singleton instance of config data
+        // load config data
         globalDiscriminatorConfiguration.load();
     }
     catch (const std::exception& e)
