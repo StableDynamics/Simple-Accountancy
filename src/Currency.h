@@ -8,6 +8,7 @@
 #if !defined(CURRENCY)
 #define CURRENCY
 
+#include <array>
 #include <string>
 #include <string_view>
 #include <vector>

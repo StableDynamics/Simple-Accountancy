@@ -8,8 +8,8 @@
 #if !defined(INCOMEOREXPENSE)
 #define INCOMEOREXPENSE
 
+#include <array>
 #include <string_view>
-#include <vector>
 
 /**
  * is it an income or an expense?
@@ -23,17 +23,22 @@ namespace IncomeOrExpense
 		maxIncomeOrExpense
 	};
 
-	const std::vector<std::string_view> incomeOrExpenseStrings3Len =
+	inline constexpr std::array<std::string_view, static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)> incomeOrExpenseStrings3Len =
 	{
 		"Inc",
 		"Exp"
 	};
 
-	const std::vector<std::string_view> incomeOrExpenseStringsOther =
+	inline constexpr std::array<std::string_view, static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)> incomeOrExpenseStringsOther =
 	{
 		"Income",
 		"Expense"
 	};
 }
+
+static_assert(IncomeOrExpense::incomeOrExpenseStrings3Len.size() == static_cast<int>(IncomeOrExpense::maxIncomeOrExpense), "IncomeOrExpense::incomeOrExpenseStrings3Len size mismatch");
+static_assert(IncomeOrExpense::incomeOrExpenseStringsOther.size() == static_cast<int>(IncomeOrExpense::maxIncomeOrExpense), "IncomeOrExpense::incomeOrExpenseStringsOther size mismatch");
+
+// namespace IncomeOrExpense
 
 #endif // !defined(INCOMEOREXPENSE)

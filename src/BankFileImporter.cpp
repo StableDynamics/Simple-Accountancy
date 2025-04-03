@@ -224,7 +224,7 @@ void BankFileImporter::processRawFStream(const std::vector<std::vector<std::stri
 }
 
 void BankFileImporter::nationwideUKProcessing(const std::vector<std::vector<std::string>>& content, const std::string& fname){
-	// Currently supports CUrrent account, savings account, and ISA statements with the format current in 2024 - Present
+	// Currently supports current account, savings account, and ISA statements with the format current in 2024 - Present
 	// Reference variables
 	LineValue lineValue;
 	size_t startLine{};
