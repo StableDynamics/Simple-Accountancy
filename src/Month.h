@@ -8,8 +8,9 @@
 #if !defined(MONTH)
 #define MONTH
 
+#include <array>
 #include <string_view>
-#include <vector>
+#include <tuple>
 
 /**
  * What month is it?
@@ -34,39 +35,21 @@ namespace Month
 		maxMonths
 	};
 
-	const std::vector<std::string_view> monthStrings3Len =
-	{
-		"Unused",
-		"Jan",
-		"Feb",
-		"Mar",
-		"Apr",
-		"May",
-		"Jun",
-		"Jul",
-		"Aug",
-		"Sep",
-		"Oct",
-		"Nov",
-		"Dec"
-	};
-	
-	const std::vector<std::string_view> monthStringsOther =
-	{
-		"Unused",
-		"January",
-		"February",
-		"March",
-		"April",
-		"May",
-		"June",
-		"July",
-		"August",
-		"September",
-		"October",
-		"November",
-		"December"
-	};
+	inline constexpr std::array enumData = { std::tuple<Month, std::string_view>{Unused		, "Unused"},
+											std::tuple<Month, std::string_view>{January		, "January"},
+											std::tuple<Month, std::string_view>{February	, "February"},
+											std::tuple<Month, std::string_view>{March		, "March"},
+											std::tuple<Month, std::string_view>{April		, "April"},
+											std::tuple<Month, std::string_view>{May			, "May"},
+											std::tuple<Month, std::string_view>{June		, "June"},
+											std::tuple<Month, std::string_view>{July		, "July"},
+											std::tuple<Month, std::string_view>{August		, "August"},
+											std::tuple<Month, std::string_view>{September	, "September"},
+											std::tuple<Month, std::string_view>{October		, "October"},
+											std::tuple<Month, std::string_view>{November	, "November"},
+											std::tuple<Month, std::string_view>{December	, "December"} };
+
+	static_assert(enumData.size() == static_cast<int>(maxMonths), "Month enumData array size mismatch");
 }
 
 

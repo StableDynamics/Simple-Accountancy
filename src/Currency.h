@@ -11,7 +11,7 @@
 #include <array>
 #include <string>
 #include <string_view>
-#include <vector>
+#include <tuple>
 
 /**
  * What currency is it?
@@ -26,28 +26,12 @@ namespace Currency
 		maxCurrencies
 	};
 
-	const std::vector<std::string_view> currencyStrings3Len =
-	{
-		"GBP",
-		"EUR",
-		"USD"
-	};
+	// u8 string is to help windows display it properly in a terminal
+	inline constexpr std::array enumData = {std::tuple<Currency, std::string_view, std::string_view, std::u8string_view>{GBP, "GBP", "£", u8"£"},
+											std::tuple<Currency, std::string_view, std::string_view, std::u8string_view>{GBP, "EUR", "€", u8"€"},
+											std::tuple<Currency, std::string_view, std::string_view, std::u8string_view>{GBP, "USD", "$", u8"$"}, };
 
-	const std::vector<std::string_view> currencyStringsOther =
-	{
-		"£",
-		"€",
-		"$"
-	};
-
-#ifdef _WIN32 // Needed in order to have Windows consoles display things properly
-	const std::vector<std::u8string> currencySymbolsu8 =
-	{
-		u8"£",
-		u8"€",
-		u8"$"
-	};
-#endif
+	static_assert(enumData.size() == static_cast<int>(maxCurrencies), "Currency enumData array size mismatch");
 }
 
 #endif // !defined(CURRENCY)

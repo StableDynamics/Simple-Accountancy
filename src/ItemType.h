@@ -8,8 +8,9 @@
 #if !defined(ITEMTYPE)
 #define ITEMTYPE
 
+#include <array>
 #include <string_view>
-#include <vector>
+#include <tuple>
 
 /**
  * What type of item is it?
@@ -36,43 +37,23 @@ namespace ItemType
 		maxItemTypes
 	};
 
-	const std::vector<std::string_view> itemTypeStrings3Len =
-	{
-		"Oth",
-		"Sal",
-		"Div",
-		"Pen",
-		"Sta",
-		"Ren",
-		"Bil",
-		"Ban",
-		"Loa",
-		"Sav",
-		"Int",
-		"Sho",
-		"Ins",
-		"Sub",
-		"Ent"
-	};
+	inline constexpr std::array enumData = {std::tuple<ItemType, std::string_view>{Other		, "Other"},
+											std::tuple<ItemType, std::string_view>{Salary		, "Salary"},
+											std::tuple<ItemType, std::string_view>{Dividend		, "Dividend"},
+											std::tuple<ItemType, std::string_view>{Pension		, "Pension"},
+											std::tuple<ItemType, std::string_view>{State_Assist	, "State Assitance"},
+											std::tuple<ItemType, std::string_view>{Rent			, "Rent"},
+											std::tuple<ItemType, std::string_view>{Bills		, "Bills"},
+											std::tuple<ItemType, std::string_view>{Bank_Fees	, "Bank Fees"},
+											std::tuple<ItemType, std::string_view>{Loans		, "Loans"},
+											std::tuple<ItemType, std::string_view>{Savings		, "Savings"},
+											std::tuple<ItemType, std::string_view>{Interest		, "Interest"},
+											std::tuple<ItemType, std::string_view>{Shopping		, "Shopping"},
+											std::tuple<ItemType, std::string_view>{Insurance	, "Insurance"},
+											std::tuple<ItemType, std::string_view>{Subscriptions, "Subscriptions"},
+											std::tuple<ItemType, std::string_view>{Entertainment, "Entertainment"} };
 
-	const std::vector<std::string_view> itemTypeStringsOther =
-	{
-		"Other",
-		"Salary",
-		"Dividend",
-		"Pension",
-		"State Assistance",
-		"Rent",
-		"Bills",
-		"Bank Fees",
-		"Loans",
-		"Savings",
-		"Interest",
-		"Shopping",
-		"Insurance",
-		"Subscriptions",
-		"Entertainment"
-	};
+	static_assert(enumData.size() == static_cast<int>(maxItemTypes), "ItemTypes enumData array size mismatch");
 }
 
 #endif // !defined(ITEMTYPE)

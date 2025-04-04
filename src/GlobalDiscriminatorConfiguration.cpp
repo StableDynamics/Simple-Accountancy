@@ -27,7 +27,7 @@ GlobalDiscriminatorConfiguration::GlobalDiscriminatorConfiguration()
     if (accptdIorEVals[0] == "")
     {
         size_t idx = 0;
-        for (auto iOrE : IncomeOrExpense::incomeOrExpenseStringsOther)
+        for (auto iOrE : IncomeOrExpense::enumData)
         {
             accptdIorEVals[idx] = std::string(iOrE);
             idx += 1;

@@ -8,8 +8,9 @@
 #if !defined(BANKNAME)
 #define BANKNAME
 
+#include <array>
 #include <string_view>
-#include <vector>
+#include <tuple>
 
 /*
  * What bank is the statement from?
@@ -25,21 +26,12 @@ namespace BankName
 		maxBanks
 	};
 
-	const std::vector<std::string_view> bankNameStrings3Len =
-	{
-		"Nat",
-		"Nat",
-		"Hal",
-		"Tid"
-	};
+	inline constexpr std::array enumData = {std::tuple<BankName, std::string_view>{Nationwide_UK_2024	, "Nationwide UK"},
+											std::tuple<BankName, std::string_view>{Natwest_UK			, "NatWest UK"},
+											std::tuple<BankName, std::string_view>{Halifax_UK			, "Halifax UK"},
+											std::tuple<BankName, std::string_view>{Tide_UK				, "Tide UK"}, };
 
-	const std::vector<std::string_view> bankNameStringsOther =
-	{
-		"Nationwide UK",
-		"Natwest UK",
-		"Halifax UK",
-		"Tide UK"
-	};
+	static_assert(enumData.size() == static_cast<int>(maxBanks), "BankName enumData array size mismatch");
 }
 
 #endif // !defined(BANKNAME)

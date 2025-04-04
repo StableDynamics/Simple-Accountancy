@@ -10,6 +10,7 @@
 
 #include <array>
 #include <string_view>
+#include <tuple>
 
 /**
  * is it an income or an expense?
@@ -23,21 +24,11 @@ namespace IncomeOrExpense
 		maxIncomeOrExpense
 	};
 
-	inline constexpr std::array<std::string_view, static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)> incomeOrExpenseStrings3Len =
-	{
-		"Inc",
-		"Exp"
-	};
+	inline constexpr std::array enumData = {std::tuple<IncomeOrExpense, std::string_view>{Income	, "Income"},
+											std::tuple<IncomeOrExpense, std::string_view>{Expense	, "Expense"} };
 
-	inline constexpr std::array<std::string_view, static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)> incomeOrExpenseStringsOther =
-	{
-		"Income",
-		"Expense"
-	};
+	static_assert(enumData.size() == static_cast<int>(maxIncomeOrExpense), "IncomeOrExpense enumData array size mismatch");
 }
-
-static_assert(IncomeOrExpense::incomeOrExpenseStrings3Len.size() == static_cast<int>(IncomeOrExpense::maxIncomeOrExpense), "IncomeOrExpense::incomeOrExpenseStrings3Len size mismatch");
-static_assert(IncomeOrExpense::incomeOrExpenseStringsOther.size() == static_cast<int>(IncomeOrExpense::maxIncomeOrExpense), "IncomeOrExpense::incomeOrExpenseStringsOther size mismatch");
 
 // namespace IncomeOrExpense
 
