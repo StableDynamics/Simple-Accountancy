@@ -4,17 +4,10 @@
 #include <string>
 #include <vector>
 
-#include "BankName.h"
 #include "BankStatement.h"
-#include "Currency.h"
 #include "GlobalDiscriminatorConfiguration.h"
-#include "HelpfulFunctions.h"
-#include "IncomeOrExpense.h"
-#include "ItemType.h"
-#include "Month.h"
 
 #ifdef _WIN32
-#pragma warning(disable : 4091) // Windows.h contains a typedef for a struct called CURRENCY within the oaidl.h file which conflicts with the enum CURRENCY and its macro and it throws a C4091 warning
 #include "Windows_SelectFiles.h"
 #endif // _WIN32
 
@@ -61,21 +54,6 @@ int main(int argc, char* argv[])
             filePathVec.emplace_back(argv[i]);
         }
     }
-
-    // Error check enums - more of a development thing...
-  //  try
-  //  {
-  //      enumErrorCheck<Month::Month>(Month::monthStrings3Len, Month::monthStringsOther, Month::maxMonths);
-  //      //enumErrorCheck<Currency::Currency>(Currency::currencyStrings3Len, Currency::currencyStringsOther, Currency::maxCurrencies);
-		////enumErrorCheck<IncomeOrExpense::IncomeOrExpense>(IncomeOrExpense::incomeOrExpenseStrings3Len, IncomeOrExpense::incomeOrExpenseStringsOther, IncomeOrExpense::maxIncomeOrExpense);
-		//enumErrorCheck<ItemType::ItemType>(ItemType::itemTypeStrings3Len, ItemType::itemTypeStringsOther, ItemType::maxItemTypes);
-		//enumErrorCheck<BankName::BankName>(BankName::bankNameStrings3Len, BankName::bankNameStringsOther, BankName::maxBanks);
-  //  }
-  //  catch (const std::exception& e)
-  //  {
-  //      std::cerr << e.what() << std::endl;
-  //      return -1;
-  //  }
 	
 	// Create vectors of class objects
 	std::vector<BankStatement> bankStatementsVec;

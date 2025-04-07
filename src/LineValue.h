@@ -10,8 +10,9 @@
 
 #include <array>
 #include <string>
+#include <vector>
 
-#include "Currency.h"
+#include "Currencies.h"
 #include "IncomeOrExpense.h"
 #include "ItemType.h"
 #include "Month.h"
@@ -37,7 +38,7 @@ struct LineValue
 	ItemType::ItemType itemType{ ItemType::maxItemTypes };		// What type of item is it?
 	std::string catResult{};									// Contains the categorisation result - exact, partial, or no match
 	std::array<int, static_cast<int>(ItemType::maxItemTypes)> 
-		catResultTally{};											// Contains the categorisation results
+		catResultTally{};										// Contains the categorisation results
 	std::string subType{};										// User defined sub-type
 	std::vector<std::string> subTypeVals{};						// Vector of the sub-type results
 

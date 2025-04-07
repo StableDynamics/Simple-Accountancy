@@ -13,7 +13,7 @@
 
 #include "MonthlyTotals.h"
 
-#include "Currency.h"
+#include "Currencies.h"
 #include "IncomeOrExpense.h"
 #include "ItemType.h"
 

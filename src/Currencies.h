@@ -5,11 +5,10 @@
 //  Original author: matth
 ///////////////////////////////////////////////////////////
 
-#if !defined(CURRENCY)
-#define CURRENCY
+#if !defined(CURRENCIES)
+#define CURRENCIES
 
 #include <array>
-#include <string>
 #include <string_view>
 #include <tuple>
 
@@ -34,4 +33,4 @@ namespace Currency
 	static_assert(enumData.size() == static_cast<int>(maxCurrencies), "Currency enumData array size mismatch");
 }
 
-#endif // !defined(CURRENCY)
+#endif // !defined(CURRENCIES)

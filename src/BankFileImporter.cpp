@@ -13,7 +13,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "Currency.h"
+#include "Currencies.h"
 #include "HelpfulFunctions.h"
 #include "IncomeOrExpense.h"
 #include "ItemTypeDiscriminator.h"
