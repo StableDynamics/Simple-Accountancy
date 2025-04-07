@@ -1,6 +1,7 @@
 ﻿#if !defined(HELPFULFUNCTIONS)
 #define HELPFULFUNCTIONS
-#include <memory>
+
+
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -9,7 +10,7 @@
 #include <vector>
 
 #include "BankName.h"
-#include "Currency.h"
+#include "Currencies.h"
 #include "IncomeOrExpense.h"
 #include "ItemType.h"
 #include "Month.h"
@@ -21,6 +22,83 @@
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
+* Helper function that takes in a variable enumData and spits out the resulting enum value
+*/
+template <typename T, typename EnumData>
+T searchEnumDataForEnum(const EnumData& enumData, std::string_view enumString)
+{
+	if (enumString.length() == 3)
+	{
+		auto it = std::find_if(enumData.begin(), enumData.end(),
+			[enumString](const auto& tuple) { return std::get<1>(tuple).substr(0, 3) == enumString; });
+		if (it != enumData.end())
+			return std::get<0>(*it);
+	}
+	else
+	{
+		auto it = std::find_if(enumData.begin(), enumData.end(),
+			[enumString](const auto& tuple) { return std::get<1>(tuple) == enumString; });
+		if (it != enumData.end())
+			return std::get<0>(*it);
+
+		// Currency is a special one
+		if constexpr (std::is_same_v<T, Currency::Currency>)
+		{
+			auto it = std::find_if(enumData.begin(), enumData.end(),
+				[enumString](const auto& tuple) { return std::get<2>(tuple) == enumString; });
+			if (it != enumData.end())
+				return std::get<0>(*it);
+		}
+	}
+
+	// If it gets here it's an error
+	std::ostringstream errMsg;
+	errMsg << "Enum string not found in enumDataToEnum for " << getTypeName<T>() << ". String supplied was: " << enumString << std::endl;
+	throw std::runtime_error(errMsg.str());
+}
+
+
+/*
+* Helper function that takes in a variable enumData and spits out the resulting string value
+*/
+template <typename T, typename EnumData>
+std::string searchEnumDataForString(const EnumData& enumData, T enumValue, std::string_view wantedStringType)
+{
+	auto it = std::find_if(enumData.begin(), enumData.end(),
+		[enumValue](const auto& tuple) { return std::get<0>(tuple) == enumValue; });
+
+	if (it != enumData.end())
+	{
+		if (wantedStringType == "3Len")
+			return std::string(std::get<1>(*it).substr(0, 3));
+		else if (wantedStringType == "Other")
+		{
+			if constexpr (std::is_same_v<T, Currency::Currency>)
+			{
+#ifdef _WIN32
+				return u8StrToStr(std::u8string(std::get<3>(*it)));
+#else
+				return std::string(std::get<2>(*it));
+#endif
+			}
+			else
+				return std::string(std::get<1>(*it));
+		}
+	}
+	else
+	{
+		std::ostringstream errMsg;
+		errMsg << "Enum type not recognised in enumDataToEnum for " << getTypeName<T>() << std::endl;
+		throw std::runtime_error("Enum value not found in enumToString for BankName");
+	}
+
+	// If it gets here it's an error
+	std::ostringstream errMsg;
+	errMsg << "Enum type not recognised in enumDataToEnum for " << getTypeName<T>() << std::endl;
+	throw std::runtime_error("Enum value not found in enumToString for BankName");
+}
+
+/*
 * Convert a string to an enum
 */
 template <typename T>
@@ -28,68 +106,22 @@ T enumFromString(const std::string_view enumString)
 {
 	static_assert(std::is_enum_v<T>); // Must be an enum
 	
-	// Setup blank data variables
-	std::unique_ptr<const std::vector<std::string_view>> enum3LenStrings_sv;
-	std::unique_ptr<const std::vector<std::string_view>> enumOtherStrings_sv;
-
-	// Determine enum name as a string_view
-	std::string_view enumName = getTypeName<T>();
-
-	// Based on the type of enum, setup data pointers, could this be done better?
-	if constexpr (std::is_same_v<T, Month::Month>)
-	{
-		enum3LenStrings_sv = std::make_unique<const std::vector<std::string_view>>(Month::monthStrings3Len);
-		enumOtherStrings_sv = std::make_unique<const std::vector<std::string_view>>(Month::monthStringsOther);
-	}
+	// Based on the type of enum: search the tuple for the requested values
+	if constexpr (std::is_same_v<T, BankName::BankName>)
+		return searchEnumDataForEnum<BankName::BankName>(BankName::enumData, enumString);
 	else if constexpr (std::is_same_v<T, Currency::Currency>)
-	{
-		enum3LenStrings_sv = std::make_unique<const std::vector<std::string_view>>(Currency::currencyStrings3Len);
-		enumOtherStrings_sv = std::make_unique<const std::vector<std::string_view>>(Currency::currencyStringsOther);
-	}
-	else if constexpr (std::is_same_v<T, ItemType::ItemType>)
-	{
-		enum3LenStrings_sv = std::make_unique<const std::vector<std::string_view>>(ItemType::itemTypeStrings3Len);
-		enumOtherStrings_sv = std::make_unique<const std::vector<std::string_view>>(ItemType::itemTypeStringsOther);
-	}
+		return searchEnumDataForEnum<Currency::Currency>(Currency::enumData, enumString);
+	else if constexpr (std::is_same_v<T, Month::Month>)
+		return searchEnumDataForEnum<Month::Month>(Month::enumData, enumString);
 	else if constexpr (std::is_same_v<T, IncomeOrExpense::IncomeOrExpense>)
-	{
-		enum3LenStrings_sv = std::make_unique<const std::vector<std::string_view>>(IncomeOrExpense::incomeOrExpenseStrings3Len);
-		enumOtherStrings_sv = std::make_unique<const std::vector<std::string_view>>(IncomeOrExpense::incomeOrExpenseStringsOther);
-	}
-	else if constexpr (std::is_same_v<T, BankName::BankName>)
-	{
-		enum3LenStrings_sv = std::make_unique<const std::vector<std::string_view>>(BankName::bankNameStrings3Len);
-		enumOtherStrings_sv = std::make_unique<const std::vector<std::string_view>>(BankName::bankNameStringsOther);
-	}
+		return searchEnumDataForEnum<IncomeOrExpense::IncomeOrExpense>(IncomeOrExpense::enumData, enumString);
+	else if constexpr (std::is_same_v<T, ItemType::ItemType>)
+		return searchEnumDataForEnum<ItemType::ItemType>(ItemType::enumData, enumString);
 	else // Throw an exception saying that the enum type is not recognised
 	{
 		std::stringstream errMsg;
-		errMsg << "Enum type not recognised in enumFromString(const std::string& enumString). Type supplied was: " << enumName << std::endl;
-		std::string err = errMsg.str();
-		throw std::runtime_error(err);
-	}
-	// Both arrays *should* be same length
-
-	// Define error message
-	std::stringstream errMsg;
-	errMsg << "Enum name not recognised in enumFromString(const std::string& enumString). Name supplied was: " << enumString << std::endl
-		<< "Enum type being compared was: " << enumName << std::endl;
-	std::string err = errMsg.str();
-
-	// Runthrough data variables to find the correct enum
-	if (enumString.length() == 3)
-	{
-		const auto found = std::find(enum3LenStrings_sv->begin(), enum3LenStrings_sv->end(), enumString);
-		const auto index = std::distance(enum3LenStrings_sv->begin(), found);
-		if (found == enum3LenStrings_sv->end()) throw std::runtime_error(err);
-		else return static_cast<T>(index);
-	}
-	else
-	{
-		const auto found = std::find(enumOtherStrings_sv->begin(), enumOtherStrings_sv->end(), enumString);
-		const auto index = std::distance(enumOtherStrings_sv->begin(), found);
-		if (found == enumOtherStrings_sv->end()) throw std::runtime_error(err);
-		else return static_cast<T>(index);
+		errMsg << "Enum type not recognised in enumFromString(const std::string& enumString). Type supplied was: " << getTypeName<T>() << std::endl;
+		throw std::runtime_error(errMsg.str());
 	}
 }
 
@@ -140,6 +172,8 @@ std::string enumToString(T enumValue, std::string_view wantedStringType = "Other
 	const auto found = std::find(acceptedStringTypes.begin(), acceptedStringTypes.end(), wantedStringType);
 	const auto index = std::distance(acceptedStringTypes.begin(), found);
 
+	std::string_view dummyStr{ "ERROR" };
+
 	if (found == acceptedStringTypes.end())
 	{
 		// This is an error state as the requested string type has not been found
@@ -149,85 +183,24 @@ std::string enumToString(T enumValue, std::string_view wantedStringType = "Other
 		std::string err = errMsg.str();
 		throw std::runtime_error(err);
 	}
-	else if (acceptedStringTypes[index] == "3Len")
+	else
 	{
-		if constexpr (std::is_same_v<T, Month::Month>)
+		if constexpr (std::is_same_v<T, BankName::BankName>)
+			return searchEnumDataForString<BankName::BankName>(BankName::enumData, enumValue, wantedStringType);
+		else if constexpr (std::is_same_v<T, Currency::Currency>)
+			return searchEnumDataForString<Currency::Currency>(Currency::enumData, enumValue, wantedStringType);
+		else if constexpr (std::is_same_v<T, Month::Month>)
+			return searchEnumDataForString<Month::Month>(Month::enumData, enumValue, wantedStringType);
+		else if constexpr (std::is_same_v<T, IncomeOrExpense::IncomeOrExpense>)
+			return searchEnumDataForString<IncomeOrExpense::IncomeOrExpense>(IncomeOrExpense::enumData, enumValue, wantedStringType);
+		else if constexpr (std::is_same_v<T, ItemType::ItemType>)
+			return searchEnumDataForString<ItemType::ItemType>(ItemType::enumData, enumValue, wantedStringType);
+		else
 		{
-			return static_cast<std::string>(Month::monthStrings3Len[enumValue]);
+			std::ostringstream errMsg;
+			errMsg << "Enum type not recognised in enumToString(T enumValue, std::string_view wantedStringType). Type supplied was: " << getTypeName<T>() << std::endl;
+			throw std::runtime_error(errMsg.str());
 		}
-		else if constexpr (std::is_same_v < T, Currency::Currency>)
-		{
-			return static_cast<std::string>(Currency::currencyStrings3Len[enumValue]);
-		}
-		else if constexpr (std::is_same_v < T, ItemType::ItemType>)
-		{
-			return static_cast<std::string>(ItemType::itemTypeStrings3Len[enumValue]);
-		}
-		else if constexpr (std::is_same_v < T, IncomeOrExpense::IncomeOrExpense>)
-		{
-			return static_cast<std::string>(IncomeOrExpense::incomeOrExpenseStrings3Len[enumValue]);
-		}
-		else if constexpr (std::is_same_v < T, BankName::BankName>)
-		{
-			return static_cast<std::string>(BankName::bankNameStrings3Len[enumValue]);
-		}
-	}
-	else if (acceptedStringTypes[index] == "Other")
-	{
-		if constexpr (std::is_same_v<T, Month::Month>)
-		{
-			return static_cast<std::string>(Month::monthStringsOther[enumValue]);
-		}
-		else if constexpr (std::is_same_v < T, Currency::Currency>)
-		{
-#if _WIN32
-			return u8StrToStr(Currency::currencySymbolsu8[enumValue]);
-#else
-			return static_cast<std::string>(Currency::currencyStringsOther[enumValue]);
-#endif
-		}
-		else if constexpr (std::is_same_v < T, ItemType::ItemType>)
-		{
-			return static_cast<std::string>(ItemType::itemTypeStringsOther[enumValue]);
-		}
-		else if constexpr (std::is_same_v < T, IncomeOrExpense::IncomeOrExpense>)
-		{
-			return static_cast<std::string>(IncomeOrExpense::incomeOrExpenseStringsOther[enumValue]);
-		}
-		else if constexpr (std::is_same_v < T, BankName::BankName>)
-		{
-			return static_cast<std::string>(BankName::bankNameStringsOther[enumValue]);
-		}
-	}
-	
-	// Catch missing enum types
-	std::string_view enumName = getTypeName<T>();
-	std::stringstream errMsg;
-	errMsg << "Enum type not recognised in enumFromString(const std::string & enumString).Type supplied was : " << enumName;
-	std::string err = errMsg.str();
-	throw std::runtime_error(err);
-}
-
-/*
-* Error check an enum
-*/
-template <typename T>
-void enumErrorCheck(const std::vector<std::string_view>& strings3Len, const std::vector<std::string_view>& stringsOther, T maxEnum)
-{
-	std::stringstream errMsg;
-	errMsg << "Missing " << static_cast<std::string>(getTypeName<T>());
-	
-	if (strings3Len.size() != maxEnum)
-	{
-		errMsg << " 3Len string" << std::endl;
-		std::string err = errMsg.str();
-		throw std::runtime_error(err);
-	}
-	if (stringsOther.size() != maxEnum)
-	{
-		errMsg << " Other string" << std::endl;
-		std::string err = errMsg.str();
-		throw std::runtime_error(err);
 	}
 }
 

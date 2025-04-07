@@ -15,7 +15,7 @@ const std::vector<std::string> u8StrvVecToStrVec(const std::vector<std::u8string
 #endif
 
 /*
-* Convert between Wide characters to std::String and vice versa
+* Convert between Wide characters to std::string and vice versa
 */
 std::string wc_tToString(const wchar_t* wstr);
 std::string wstringToString(const std::wstring wstr);

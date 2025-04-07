@@ -105,7 +105,7 @@ void BankStatement::printStatementSummary(int strLen) {
 #endif // _WIN32
 			}
 			// Income vs Expenditure
-			std::cout << "Average Monthly Income vs Expenditure " << currSym_sv << ": ";
+			std::cout << "Average Monthly Income vs Expenditure: ";
 			if (avgIncVsExp[currIdx] < 0.0)
 			{
 				std::stringstream tot;

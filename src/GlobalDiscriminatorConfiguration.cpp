@@ -27,9 +27,9 @@ GlobalDiscriminatorConfiguration::GlobalDiscriminatorConfiguration()
     if (accptdIorEVals[0] == "")
     {
         size_t idx = 0;
-        for (auto iOrE : IncomeOrExpense::incomeOrExpenseStringsOther)
+        for (auto iOrE : IncomeOrExpense::enumData)
         {
-            accptdIorEVals[idx] = std::string(iOrE);
+            accptdIorEVals[idx] = std::string(std::get<1>(iOrE));
             idx += 1;
         }
         accptdIorEVals[idx] = "Income or Expense";
@@ -108,10 +108,10 @@ void GlobalDiscriminatorConfiguration::load()
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void GlobalDiscriminatorConfiguration::impl::writeToFile(const std::string& fname) {
-    for (auto itemType : ItemType::itemTypeStringsOther)
+    for (auto itemType : ItemType::enumData)
     {
         // Top Level Item Type
-        configData[std::string(itemType)] = {{ "Your Item Type Description", accptdIorEVals.back(), "Your Item Sub-Type"},
+        configData[std::string(std::get<1>(itemType))] = {{ "Your Item Type Description", accptdIorEVals.back(), "Your Item Sub-Type"},
         { "Your Other Item Type Description", accptdIorEVals.back(), "Your Item Sub-Type" }};
     }
 

@@ -15,7 +15,7 @@
 #include <vector>
 
 #include "BankFileImporter.h"
-#include "Currency.h"
+#include "Currencies.h"
 #include "IncomeOrExpense.h"
 #include "itemType.h"
 #include "LineValue.h"
