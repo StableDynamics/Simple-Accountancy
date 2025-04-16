@@ -409,45 +409,31 @@ void BankFileImporter::makeSureDataIsAscending() {
 	// Check and rearrange as required
 	// ASSUMPTION: Data is in year order, then month order, then day order
 	// Worth just using sort on data regardless of bank?
-	if (rawExpenses.begin()->year >= std::prev(rawExpenses.end())->year)
+	// Most bank csvs don't have time info so if the statement only contains transactions from the same day assumptions
+	// are made based on the bank
+	// Could possibly speed this up by removing the break's but need more support for banks
+	switch (bankName)
 	{
-		if (rawExpenses.begin()->month >= std::prev(rawExpenses.end())->month)
-		{
-			if (rawExpenses.begin()->day >= std::prev(rawExpenses.end())->day)
-			{
-				if (rawExpenses.begin()->day == std::prev(rawExpenses.end())->day)
-				{
-					// Most bank csvs don't have time info so if the statement only contains transactions from the same day assumptions
-					// are made based on the bank
-					// Could possibly speed this up by removing the break's but need more support for banks
-					switch (bankName)
-					{
-					case BankName::Nationwide_UK_2024:
-						// Nationwide UK csvs are in ascending order so no need to rearrange
-						break;
-					case BankName::Natwest_UK_2024:
-						// Natwest UK csvs are in descending order so need to rearrange
-						std::reverse(rawExpenses.begin(), rawExpenses.end());
-						break;
-					case BankName::Halifax_UK:
-						// Currently unknown
-						break;
-					case BankName::Tide_UK:
-						// Currently unknown
-						break;
-					case BankName::maxBanks:
-						// Currently unknown
-						break;
-					default:
-						// Shouldn't be in here but if a bank has been added to the enum and hasn't been added to the switch
-						// it'll tell the dev what's happening
-						throw std::runtime_error("Bank not recognised in BankStatement::makeSureDataIsAscending()");
-						break;
-					}
-				}
-				// Expense is in descending order and needs to be rearranged
-				std::reverse(rawExpenses.begin(), rawExpenses.end());
-			}
-		}
+	case BankName::Nationwide_UK_2024:
+		// Nationwide UK csvs are in ascending order so no need to rearrange
+		break;
+	case BankName::Natwest_UK_2024:
+		// Natwest UK csvs are in descending order so need to rearrange
+		std::reverse(rawExpenses.begin(), rawExpenses.end());
+		break;
+	case BankName::Halifax_UK:
+		// Currently unknown
+		break;
+	case BankName::Tide_UK:
+		// Currently unknown
+		break;
+	case BankName::maxBanks:
+		throw std::runtime_error("Bank name not modified from maxBanks and detected in BankStatement::makeSureDataIsAscending()");
+		break;
+	default:
+		// Shouldn't be in here but if a bank has been added to the enum and hasn't been added to the switch
+		// it'll tell the dev what's happening
+		throw std::runtime_error("Bank not recognised in BankStatement::makeSureDataIsAscending()");
+		break;
 	}
 }
