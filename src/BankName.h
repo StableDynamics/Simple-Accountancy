@@ -22,14 +22,14 @@ namespace BankName
 		Nationwide_UK_2024,
 		Natwest_UK_2024,
 		Halifax_UK,
-		Tide_UK,
+		Tide_UK_2024,
 		maxBanks
 	};
 
 	inline constexpr std::array enumData = {std::tuple<BankName, std::string_view>{Nationwide_UK_2024	, "Nationwide UK"},
 											std::tuple<BankName, std::string_view>{Natwest_UK_2024		, "NatWest UK"},
 											std::tuple<BankName, std::string_view>{Halifax_UK			, "Halifax UK"},
-											std::tuple<BankName, std::string_view>{Tide_UK				, "Tide UK"}, };
+											std::tuple<BankName, std::string_view>{Tide_UK_2024			, "Tide UK"}, };
 
 	static_assert(enumData.size() == static_cast<int>(maxBanks), "BankName enumData array size mismatch");
 }

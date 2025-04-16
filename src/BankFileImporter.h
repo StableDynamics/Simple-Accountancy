@@ -52,6 +52,7 @@ private:
 	void determineBank(const std::vector<std::vector<std::string>>& content);
 	void nationwideUKProcessing(const std::vector<std::vector<std::string>>& content, const std::string& fname);
 	void natwestUKProcessing(const std::vector<std::vector<std::string>>& content, const std::string& fname);
+	void tideUKProcessing(const std::vector<std::vector<std::string>>& content, const std::string& fname);
 	void makeSureDataIsAscending();
 	virtual void refreshRefs();
 
