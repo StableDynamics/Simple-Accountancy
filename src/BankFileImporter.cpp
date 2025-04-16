@@ -123,40 +123,45 @@ std::vector<std::vector<std::string>> BankFileImporter::importFile(const std::st
 		std::string line, word;
 		std::stringstream strStream;
 		std::stringstream wordStream; // If anything has a comma in it as part of the text this stream accounts for that
+		bool isCompound{ false }; // Flag to detect if the word is a compound word
 
 		// While there are lines to get from the file it will build up 'content' with the line 
-		// data from the csv file
+		// data from the csv file. Need to also make sure if the word starts with @ or if it doesn't and act accordingly
 		while (std::getline(file, line))
 		{
 			// Row variable holds each row from the file temporarily, clear it to start
 			row.clear();
 			strStream.str(line);
+			isCompound = false; // (Re)Set to false
 
 			while (std::getline(strStream, word, ','))
 			{
-				if (word.back() == '\"')
+				if (word.front() == '\"' && word.back() != '\"') // If the word starts with a quote but doesn't end with one
 				{
-					if (wordStream.rdbuf()->in_avail() > 0)
-					{
-						// Add compound word
-						wordStream << word;
-						row.emplace_back(wordStream.str());
-
-						// Clear the stream
-						wordStream.str(std::string());;	wordStream.clear();
-					}
-					else
-					{
-						// Add each word to the row
-						row.emplace_back(word);
-					}
-				}
-				else
-				{
-					// Add it to the stream
+					isCompound = true; // Set the flag to true
 					wordStream << word;
 				}
-				
+				else if (word.back() == '\"' && isCompound) // If the word ends with a quote and is a compound word
+				{
+					wordStream << "," << word;
+					row.emplace_back(wordStream.str());
+
+					// Clear the stream
+					wordStream.str(std::string());;	wordStream.clear();
+					isCompound = false; // Reset the flag
+				}
+				else if (isCompound) // If the word is a compound word
+				{
+					wordStream << "," << word; // Add the comma and the word to the stream
+				}
+				else // Word is not a compound word
+				{
+					wordStream << word; // Add the word to the stream
+					row.emplace_back(wordStream.str());
+
+					// Clear the stream
+					wordStream.str(std::string());;	wordStream.clear();
+				}				
 			}
 			// Add the row to content, and reset strStream
 			content.emplace_back(row);
@@ -181,6 +186,19 @@ std::vector<std::vector<std::string>> BankFileImporter::importFile(const std::st
 	return content;
 }
 
+
+/*
+* Refreshes/creates the reference array to the rawExpenses
+*/
+void BankFileImporter::refreshRefs() {
+	rawExpensesRef = { rawExpenses.begin(), rawExpenses.end() };
+}
+
+
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+* Bank Specific Functions
+*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /*
 * Work out what bank it is and assign its name
 */
@@ -189,6 +207,10 @@ void BankFileImporter::determineBank(const std::vector<std::vector<std::string>>
 	if (content[0][0] == "\"Account Name:\"") // Consistent with Nationwide statements from 2024 - Present
 	{
 		bankName = BankName::Nationwide_UK_2024;
+	}
+	else if (content[0][0] == "Date") // consistent with Natwest statements from 2024 - present
+	{
+		bankName = BankName::Natwest_UK_2024;
 	}
 	else
 	{
@@ -206,9 +228,10 @@ void BankFileImporter::processRawFStream(const std::vector<std::vector<std::stri
 	case BankName::Nationwide_UK_2024:
 		nationwideUKProcessing(content, fname);
 		break;
-	case BankName::Natwest_UK:
+	case BankName::Natwest_UK_2024:
 		// NatWest formats credit cards differently to current accounts in that the last entry is the balance
 		// in the account at the end of the period
+		natwestUKProcessing(content, fname);
 		break;
 	case BankName::Halifax_UK:
 		break;
@@ -280,7 +303,7 @@ void BankFileImporter::nationwideUKProcessing(const std::vector<std::vector<std:
 			else
 				lineValue.balance = std::stod(content[i][5].substr(2, content[i][5].size() - 3));
 
-			// This is where a discrimiator would sit in order to determine the line item type
+			// Determine the item type
 			determineItemType(lineValue);
 
 			// Push lineValue back into the expenses vector
@@ -293,7 +316,92 @@ void BankFileImporter::nationwideUKProcessing(const std::vector<std::vector<std:
 }
 
 
-void BankFileImporter::makeSureDataIsAscending(){
+void BankFileImporter::natwestUKProcessing(const std::vector<std::vector<std::string>>& content, const std::string& fname) {
+	// Currently supports current account and credit card accounts with the format current in 2024 - Present
+	// Reference variables
+	LineValue lineValue;
+	size_t startLine{};
+	std::stringstream accName;
+
+	// Credit card statements have an additional row at the end that contains the balance, work out if it is present 
+	// and if it needs to be ignored
+	int ignoreLastRow{ 0 };
+	if (content[content.size() - 1][2].find("Balance") != std::string::npos)
+		ignoreLastRow = 1; // Ignore the last row
+
+	switch (bankName)
+	{
+	case BankName::Natwest_UK_2024:
+		// Using zero based indexing - data starts on line 1 from Natwest csvs
+		startLine = 1;
+
+		// Account name for Natwest is on line 1, element 5 with account number on line 1 element 6
+		accName << content[1][5].substr(0, content[1][5].size()) << ", " << content[1][6].substr(0, content[1][6].size());
+		accountName = accName.str();
+
+		// Loop through the content and create LineValue objects
+		// would be nice to take the column row from the csv and match it up
+		// Hardcoded values are as such:
+		// 0 - Date
+		// 1 - Transaction Type
+		// 2 - Description (occassionally has compound words with " wrapping them)
+		// 3 - Value (can be +ve or -ve)
+		// 4 - Balance
+		// 5 - Account Name
+		// 6 - Account Number
+		for (size_t i = startLine; i < content.size() - ignoreLastRow; i++)
+		{
+			lineValue.day = std::stoi(content[i][0].substr(0, 2));
+			lineValue.month = enumFromString<Month::Month>(content[i][0].substr(3, 3), i, fname);
+			lineValue.year = std::stoi(content[i][0].substr(7, 4));
+			lineValue.transactType = content[i][1].substr(0, content[i][1].size());
+
+			// Determine if there are " or not in the description string
+			if (content[i][2][0] == '\"')
+				lineValue.description = content[i][2].substr(1, content[i][2].size() - 1);
+			else
+				lineValue.description = content[i][2].substr(0, content[i][2].size());
+
+			// Assign Paid in/Paid out
+			// ASSUMPTION: csv file will not have 'information only' entries with no money values
+			// ASSUMPTION: Natwest csvs wil only have GBP transactions due to the values being only numbers
+			if (content[i][3][0] != '-') // Value is +ve
+			{
+				lineValue.paidOut = 0.0;
+				lineValue.paidIn = std::stod(content[i][3].substr(0, content[i][3].size()));
+				lineValue.currency = Currency::GBP;
+				lineValue.incomeOrExpense = IncomeOrExpense::Income;
+			}
+			else // Value is -ve
+			{
+				lineValue.paidOut = std::stod(content[i][3].substr(1, content[i][3].size()));
+				lineValue.paidIn = 0.0;
+				lineValue.currency = Currency::GBP;
+				lineValue.incomeOrExpense = IncomeOrExpense::Expense;
+			}
+
+			// Is balance positive or negative?
+			if (content[i][4][0] == '-' && content[i][4] != "")
+				lineValue.balance = std::stod(content[i][4].substr(1, content[i][4].size()));
+			else if (content[i][4][0] != '-' && content[i][4] != "")
+				lineValue.balance = std::stod(content[i][4].substr(0, content[i][4].size()));
+			else
+				lineValue.balance = 0.0;
+
+			// Determine the item type
+			determineItemType(lineValue);
+
+			// Push lineValue back into the expenses vector
+			rawExpenses.push_back(lineValue);
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+
+void BankFileImporter::makeSureDataIsAscending() {
 	// Determine if the data in expenses is in ascending order (oldest first) or not, if not then
 	// rearrange it into ascending order
 	if (rawExpenses.empty()) throw std::runtime_error("No data in rawExpenses vector");
@@ -317,7 +425,7 @@ void BankFileImporter::makeSureDataIsAscending(){
 					case BankName::Nationwide_UK_2024:
 						// Nationwide UK csvs are in ascending order so no need to rearrange
 						break;
-					case BankName::Natwest_UK:
+					case BankName::Natwest_UK_2024:
 						// Natwest UK csvs are in descending order so need to rearrange
 						std::reverse(rawExpenses.begin(), rawExpenses.end());
 						break;
@@ -342,12 +450,4 @@ void BankFileImporter::makeSureDataIsAscending(){
 			}
 		}
 	}
-}
-
-
-/*
-* Refreshes/creates the reference array to the rawExpenses
-*/
-void BankFileImporter::refreshRefs() {
-	rawExpensesRef = { rawExpenses.begin(), rawExpenses.end() };
 }
