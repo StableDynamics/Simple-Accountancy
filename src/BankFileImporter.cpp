@@ -208,9 +208,13 @@ void BankFileImporter::determineBank(const std::vector<std::vector<std::string>>
 	{
 		bankName = BankName::Nationwide_UK_2024;
 	}
-	else if (content[0][0] == "Date") // consistent with Natwest statements from 2024 - present
+	else if (content[0][0] == "Date") // Consistent with Natwest statements from 2024 - Present
 	{
 		bankName = BankName::Natwest_UK_2024;
+	}
+	else if (content[0][0] == "\"Date\"") // Consistent with Tide statements from 2024 - Present
+	{
+		bankName = BankName::Tide_UK_2024;
 	}
 	else
 	{
@@ -235,7 +239,8 @@ void BankFileImporter::processRawFStream(const std::vector<std::vector<std::stri
 		break;
 	case BankName::Halifax_UK:
 		break;
-	case BankName::Tide_UK:
+	case BankName::Tide_UK_2024:
+		tideUKProcessing(content, fname);
 		break;
 	default:
 		// Shouldn't be in here but if a bank has been added to the enum and hasn't been added to the switch
@@ -283,13 +288,13 @@ void BankFileImporter::nationwideUKProcessing(const std::vector<std::vector<std:
 			if (content[i][3] == "\"\"") // Paid out is blank
 			{
 				lineValue.paidOut = 0.0;
-				lineValue.paidIn = std::stod(content[i][4].substr(2, content[i][4].size() - 3));
+				lineValue.paidIn = std::stod(content[i][4].substr(2, content[i][4].size() - 2));
 				lineValue.currency = enumFromString<Currency::Currency>(content[i][4].substr(1, 1), i, fname);
 				lineValue.incomeOrExpense = IncomeOrExpense::Income;
 			}
 			else
 			{
-				lineValue.paidOut = std::stod(content[i][3].substr(2, content[i][3].size() - 3));
+				lineValue.paidOut = std::stod(content[i][3].substr(2, content[i][3].size() - 2));
 				lineValue.paidIn = 0.0;
 				lineValue.currency = enumFromString<Currency::Currency>(content[i][3].substr(1, 1), i, fname);
 				lineValue.incomeOrExpense = IncomeOrExpense::Expense;
@@ -298,10 +303,10 @@ void BankFileImporter::nationwideUKProcessing(const std::vector<std::vector<std:
 			// Is balance positive or negative?
 			if (content[i][5].substr(1, 1) == "-")
 			{
-				lineValue.balance = std::stod(content[i][5].substr(3, content[i][5].size() - 3));
+				lineValue.balance = std::stod(content[i][5].substr(3, content[i][5].size() - 2));
 			}
 			else
-				lineValue.balance = std::stod(content[i][5].substr(2, content[i][5].size() - 3));
+				lineValue.balance = std::stod(content[i][5].substr(2, content[i][5].size() - 2));
 
 			// Determine the item type
 			determineItemType(lineValue);
@@ -401,6 +406,87 @@ void BankFileImporter::natwestUKProcessing(const std::vector<std::vector<std::st
 }
 
 
+void BankFileImporter::tideUKProcessing(const std::vector<std::vector<std::string>>& content, const std::string& fname) {
+	// Currently supports business current account statements with the format current in 2024 - Present
+	// Reference variables
+	LineValue lineValue;
+	size_t startLine{};
+	auto lastSlash = fname.find_last_of("\\");
+	auto firstUnderscore = fname.find_first_of("_", lastSlash);
+
+	switch (bankName)
+	{
+	case BankName::Tide_UK_2024:
+		// Using zero based indexing - data starts on line 1 from Tide csvs
+		startLine = 1;
+
+		// Tide statements do not have an account name in them but the fname might do if it hasn't been altered
+		if (firstUnderscore != std::string::npos)
+			// ASSUMPTION: Default Tide formatting is always "Tide Account Type_DD_Mmm_YYYY_HH.MM.SS.csv"
+			if (fname.substr(lastSlash, firstUnderscore - lastSlash).find("Tide") != std::string::npos)
+				accountName = fname.substr(lastSlash + 1, firstUnderscore - lastSlash - 1);
+			else
+				accountName = "Tide Account";
+		else
+			accountName = "Tide Account";
+
+		// Loop through the content and create LineValue objects
+		// would be nice to take the column row from the csv and match it up
+		// Hardcoded values are as such:
+		// 0  - Date
+		// 1  - Transaction ID
+		// 2  - Description
+		// 3  - Reference
+		// 4  - From
+		// 5  - To
+		// 6  - Paid In
+		// 7  - Paid Out
+		// 8  - Category Name
+		// 9  - Transaction Type
+		// 10 - Status
+		// 11 - Initiated By
+		for (size_t i = startLine; i < content.size(); i++)
+		{
+			lineValue.day = std::stoi(content[i][0].substr(9, 2));
+			lineValue.month = static_cast<Month::Month>(std::stoi(content[i][0].substr(6, 2)));
+			lineValue.year = std::stoi(content[i][0].substr(1, 4));
+			lineValue.transactType = content[i][9].substr(1, content[i][9].size() - 2);
+			lineValue.description = content[i][2].substr(1, content[i][2].size() - 2);
+
+			// Assign Paid in/Paid out
+			// ASSUMPTION: csv file will not have 'information only' entries with no money values
+			// ASSUMPTION: Tide csvs wil only have GBP transactions due to the values being only numbers
+			if (content[i][7] == "\"\"") // Paid out is blank
+			{
+				lineValue.paidOut = 0.0;
+				lineValue.paidIn = std::stod(content[i][6].substr(1, content[i][4].size() - 2));
+				lineValue.currency = Currency::GBP;
+				lineValue.incomeOrExpense = IncomeOrExpense::Income;
+			}
+			else
+			{
+				lineValue.paidOut = std::stod(content[i][7].substr(1, content[i][7].size() - 2));
+				lineValue.paidIn = 0.0;
+				lineValue.currency = Currency::GBP;
+				lineValue.incomeOrExpense = IncomeOrExpense::Expense;
+			}
+
+			// Tide csvs do not have a value for balance
+			lineValue.balance = 0.0;
+
+			// Determine the item type
+			determineItemType(lineValue);
+
+			// Push lineValue back into the expenses vector
+			rawExpenses.push_back(lineValue);
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+
 void BankFileImporter::makeSureDataIsAscending() {
 	// Determine if the data in expenses is in ascending order (oldest first) or not, if not then
 	// rearrange it into ascending order
@@ -424,7 +510,7 @@ void BankFileImporter::makeSureDataIsAscending() {
 	case BankName::Halifax_UK:
 		// Currently unknown
 		break;
-	case BankName::Tide_UK:
+	case BankName::Tide_UK_2024:
 		// Currently unknown
 		break;
 	case BankName::maxBanks:
