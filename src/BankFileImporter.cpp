@@ -123,40 +123,45 @@ std::vector<std::vector<std::string>> BankFileImporter::importFile(const std::st
 		std::string line, word;
 		std::stringstream strStream;
 		std::stringstream wordStream; // If anything has a comma in it as part of the text this stream accounts for that
+		bool isCompound{ false }; // Flag to detect if the word is a compound word
 
 		// While there are lines to get from the file it will build up 'content' with the line 
-		// data from the csv file
+		// data from the csv file. Need to also make sure if the word starts with @ or if it doesn't and act accordingly
 		while (std::getline(file, line))
 		{
 			// Row variable holds each row from the file temporarily, clear it to start
 			row.clear();
 			strStream.str(line);
+			isCompound = false; // (Re)Set to false
 
 			while (std::getline(strStream, word, ','))
 			{
-				if (word.back() == '\"')
+				if (word.front() == '\"' && word.back() != '\"') // If the word starts with a quote but doesn't end with one
 				{
-					if (wordStream.rdbuf()->in_avail() > 0)
-					{
-						// Add compound word
-						wordStream << word;
-						row.emplace_back(wordStream.str());
-
-						// Clear the stream
-						wordStream.str(std::string());;	wordStream.clear();
-					}
-					else
-					{
-						// Add each word to the row
-						row.emplace_back(word);
-					}
-				}
-				else
-				{
-					// Add it to the stream
+					isCompound = true; // Set the flag to true
 					wordStream << word;
 				}
-				
+				else if (word.back() == '\"' && isCompound) // If the word ends with a quote and is a compound word
+				{
+					wordStream << "," << word;
+					row.emplace_back(wordStream.str());
+
+					// Clear the stream
+					wordStream.str(std::string());;	wordStream.clear();
+					isCompound = false; // Reset the flag
+				}
+				else if (isCompound) // If the word is a compound word
+				{
+					wordStream << "," << word; // Add the comma and the word to the stream
+				}
+				else // Word is not a compound word
+				{
+					wordStream << word; // Add the word to the stream
+					row.emplace_back(wordStream.str());
+
+					// Clear the stream
+					wordStream.str(std::string());;	wordStream.clear();
+				}				
 			}
 			// Add the row to content, and reset strStream
 			content.emplace_back(row);
@@ -180,6 +185,19 @@ std::vector<std::vector<std::string>> BankFileImporter::importFile(const std::st
 
 	return content;
 }
+
+
+/*
+* Refreshes/creates the reference array to the rawExpenses
+*/
+void BankFileImporter::refreshRefs() {
+	rawExpensesRef = { rawExpenses.begin(), rawExpenses.end() };
+}
+
+
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+* Bank Specific Functions
+*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
 * Work out what bank it is and assign its name
@@ -293,7 +311,7 @@ void BankFileImporter::nationwideUKProcessing(const std::vector<std::vector<std:
 }
 
 
-void BankFileImporter::makeSureDataIsAscending(){
+void BankFileImporter::makeSureDataIsAscending() {
 	// Determine if the data in expenses is in ascending order (oldest first) or not, if not then
 	// rearrange it into ascending order
 	if (rawExpenses.empty()) throw std::runtime_error("No data in rawExpenses vector");
@@ -342,12 +360,4 @@ void BankFileImporter::makeSureDataIsAscending(){
 			}
 		}
 	}
-}
-
-
-/*
-* Refreshes/creates the reference array to the rawExpenses
-*/
-void BankFileImporter::refreshRefs() {
-	rawExpensesRef = { rawExpenses.begin(), rawExpenses.end() };
 }
