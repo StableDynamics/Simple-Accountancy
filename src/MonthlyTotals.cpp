@@ -10,6 +10,11 @@
 #include <sstream>
 #include <stdexcept>
 
+#include "Currencies.h"
+#include "IncomeOrExpense.h"
+#include "ItemType.h"
+#include "LineValue.h"
+
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 * Public functions
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,7 +25,7 @@ MonthlyTotals::MonthlyTotals(){
 
 MonthlyTotals::MonthlyTotals(const std::string& fname) : BankFileImporter::BankFileImporter(fname) {
 	// Process statement
-	std::vector<std::reference_wrapper<LineValue>> expenses = BankFileImporter::getRawExpRef();
+	LineValueRefs expenses = BankFileImporter::getRawExpRef();
 	processStatement(expenses);
 
 	// Check array sizes are the same
@@ -44,27 +49,22 @@ MonthlyTotals::MonthlyTotals(MonthlyTotals&& other) noexcept
 }
 
 
-const std::vector<std::vector<std::array<std::array<std::array<std::vector<std::reference_wrapper<const LineValue>>,
-	static_cast<int>(ItemType::maxItemTypes) + 1>, static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>,
-	static_cast<int>(Currency::maxCurrencies)>>> MonthlyTotals::getProcessedStatement() const 
+const ProcessedStatement MonthlyTotals::getProcessedStatement() const 
 {
 	return processedStatement;
 }
 
-const std::vector<std::vector<std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
-	static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& MonthlyTotals::getMonthlyTotals() const 
+const YrMtCrIEITTotal& MonthlyTotals::getMonthlyTotals() const
 {
 	return monthlyTotals;
 }
 
-const std::vector<std::vector<std::array<std::array<std::array<uint64_t, static_cast<int>(ItemType::maxItemTypes) + 1>,
-	static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& MonthlyTotals::getMonthlyOccurances() const 
+const YrMtCrIEITOcc& MonthlyTotals::getMonthlyOccurances() const
 {
 	return monthlyOccurances;
 }
 
-const std::vector<std::vector<std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
-	static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& MonthlyTotals::getmonthlyAvgSnglTrnsct() const 
+const YrMtCrIEITAvg& MonthlyTotals::getmonthlyAvgSnglTrnsct() const
 {
 	return monthlyAvgSnglTrnsct;
 }
@@ -107,7 +107,7 @@ void swap(MonthlyTotals& first, MonthlyTotals& second) {
 /*
 * Process the statement with a switch to work out if it's everything or just the references that need to be reprocessed
 */
-void MonthlyTotals::processStatement(const std::vector<std::reference_wrapper<LineValue>> expenses, int newOrRefresh) {
+void MonthlyTotals::processStatement(const LineValueRefs expenses, int newOrRefresh) {
 	if (newOrRefresh > 1) throw std::runtime_error("MonthlyTotals::processStatement(int newOrRefresh) called with wrong value. "
 		"Acceptable values are 0 for new object and 1 for refresh of references.");
 	// Function changes based on input newOrRefresh
@@ -299,7 +299,7 @@ void MonthlyTotals::determineItemType(const LineValue& expense, const size_t mon
 /*
 * Error check array sizes
 */
-void MonthlyTotals::checkArrays(const std::vector<std::reference_wrapper<LineValue>> expenses) {
+void MonthlyTotals::checkArrays(const LineValueRefs expenses) {
 	std::stringstream errMsg;
 	if (yearsContained.size() != monthsContained.size() || yearsContained.size() != monthlyTotals.size())
 	{
