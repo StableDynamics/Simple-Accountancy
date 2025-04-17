@@ -7,7 +7,8 @@
 
 #include "BankStatement.h"
 
-#include <vector>
+
+#include "IncomeOrExpense.h"
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 * Public functions
@@ -39,8 +40,7 @@ void BankStatement::calculateAvg(){
 	int totalMonths{ 0 };
 
 
-	const std::vector<std::vector<std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
-		static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>> monthlyTotals =  getMonthlyTotals();
+	const YrMtCrIEITTotal monthlyTotals =  getMonthlyTotals();
 
 	for (auto& year : monthlyTotals)
 		for (auto& month : year) {

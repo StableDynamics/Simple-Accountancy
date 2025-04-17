@@ -9,16 +9,11 @@
 #define MONTHLYTOTALS
 
 #include <array>
-#include <cstdint>
-#include <functional>
 #include <string>
 #include <vector>
 
 #include "BankFileImporter.h"
-#include "Currencies.h"
-#include "IncomeOrExpense.h"
-#include "itemType.h"
-#include "LineValue.h"
+#include "ForwardDecls.h"
 #include "Month.h"
 
 /*
@@ -34,18 +29,13 @@ public:
 	MonthlyTotals(const MonthlyTotals& other) = default; // Copy constructor
 	MonthlyTotals(MonthlyTotals&& other) noexcept; // Move constructor
 
-	const std::vector<std::vector<std::array<std::array<std::array<std::vector<std::reference_wrapper<const LineValue>>,
-		static_cast<int>(ItemType::maxItemTypes) + 1>, static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>,
-		static_cast<int>(Currency::maxCurrencies)>>> getProcessedStatement() const;
+	const ProcessedStatement getProcessedStatement() const;
 
-	const std::vector<std::vector<std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
-		static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& getMonthlyTotals() const;
+	const YrMtCrIEITTotal& getMonthlyTotals() const;
 
-	const std::vector<std::vector<std::array<std::array<std::array<uint64_t, static_cast<int>(ItemType::maxItemTypes) + 1>,
-		static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& getMonthlyOccurances() const;
+	const YrMtCrIEITOcc& getMonthlyOccurances() const;
 
-	const std::vector<std::vector<std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
-		static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>& getmonthlyAvgSnglTrnsct() const;
+	const YrMtCrIEITAvg& getmonthlyAvgSnglTrnsct() const;
 
 	const std::array<int, 2> getYearMonthAmounts();
 
@@ -63,40 +53,16 @@ private:
 	// Type explained below:
 	// 0 - maxItemTypes = totals according to ItemType enum
 	// end = Totals
-	std::vector<
-		std::vector<
-			std::array<
-				std::array<
-					std::array<std::vector<std::reference_wrapper<const LineValue>>, static_cast<int>(ItemType::maxItemTypes) + 1>,
-					static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>,
-		static_cast<int>(Currency::maxCurrencies)>>> processedStatement = { {{{{{}}}}} }; // Processed LineValues into their categories
-	std::vector<
-		std::vector<
-			std::array<
-				std::array<
-					std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
-					static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>,
-					static_cast<int>(Currency::maxCurrencies)>>> monthlyTotals = { {{{{}}}} }; // Total per type
-	std::vector<
-		std::vector<
-			std::array<
-				std::array<
-					std::array<uint64_t, static_cast<int>(ItemType::maxItemTypes) + 1>,
-					static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>,
-					static_cast<int>(Currency::maxCurrencies)>>> monthlyOccurances = { {{{{}}}} }; // Times each type occurs
-	std::vector<
-		std::vector<
-			std::array<
-				std::array<
-					std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
-					static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>,
-					static_cast<int>(Currency::maxCurrencies)>>> monthlyAvgSnglTrnsct = { {{{{}}}} }; // Average singular transaction per type
+	ProcessedStatement processedStatement = { {{{{{}}}}} };		// Processed LineValues into their categories
+	YrMtCrIEITTotal monthlyTotals = { {{{{}}}} };				// Total per type
+	YrMtCrIEITOcc monthlyOccurances = { {{{{}}}} };				// Times each type occurs
+	YrMtCrIEITAvg monthlyAvgSnglTrnsct = { {{{{}}}} };			// Average singular transaction per type
 
 
-	void processStatement(const std::vector<std::reference_wrapper<LineValue>> expenses, int newOrRefresh = 0);
+	void processStatement(const LineValueRefs expenses, int newOrRefresh = 0);
 	size_t returnTotalIndex();
 	void determineItemType(const LineValue& expense, const size_t monthIdx, const size_t yearIdx, int newOrRefresh = 0);
-	void checkArrays(const std::vector<std::reference_wrapper<LineValue>> expenses);
+	void checkArrays(const LineValueRefs expenses);
 	void calculateAverages();
 	virtual void refreshRefs();
 

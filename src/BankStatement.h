@@ -8,14 +8,11 @@
 #if !defined(BANKSTATEMENT)
 #define BANKSTATEMENT
 
-#include <array>
 #include <string>
 
 #include "MonthlyTotals.h"
 
-#include "Currencies.h"
-#include "IncomeOrExpense.h"
-#include "ItemType.h"
+#include "ForwardDecls.h"
 
 /**
  * This class inherits from MonthlyTotals and is meant to contain more advanced 
@@ -36,12 +33,12 @@ private:
 	// Stores monthly averages arranged by currency, and then income or expense, and then individual array values are ItemTypes
 	// currency.incomeOrExpense.type
 	// Type explained below:
-	// 0 - maxItemTypes = totals according to ItemType enum
+	// 0 - (maxItemTypes - 1) = totals according to ItemType enum
 	// end = Totals
-	std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>, static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)> avgByType = { {{}} };
+	CrIEITAvg avgByType = { {{}} };
 	
 	// Stores values comparing average monthly income to expenses for each currency 
-	std::array<double, static_cast<int>(Currency::maxCurrencies)> avgIncVsExp = {};
+	AvgIEbyCr avgIncVsExp = {};
 
 	void calculateAvg();
 

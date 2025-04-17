@@ -10,13 +10,14 @@
 #include <fstream>
 #include <stdexcept>
 #include <string_view>
-#include <type_traits>
 #include <utility>
 
+#include "AccountingPeriod.h"
 #include "Currencies.h"
 #include "HelpfulFunctions.h"
 #include "IncomeOrExpense.h"
 #include "ItemTypeDiscriminator.h"
+#include "LineValue.h"
 #include "Month.h"
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -29,7 +30,7 @@ BankFileImporter::BankFileImporter(){
 
 BankFileImporter::BankFileImporter(const std::string& fname) {
 	// Process file
-	std::vector<std::vector<std::string>> content = importFile(fname);
+	ContentVec content = importFile(fname);
 
 	// Determine what Bank the statement is from
 	determineBank(content);
@@ -73,7 +74,7 @@ const std::string_view BankFileImporter::getAccountName() const {
 }
 
 
-const std::vector<std::reference_wrapper<LineValue>> BankFileImporter::getRawExpRef() const {
+const LineValueRefs BankFileImporter::getRawExpRef() const {
 	return rawExpensesRef;
 }
 
@@ -110,8 +111,8 @@ void swap(BankFileImporter& first, BankFileImporter& second) {
 /*
 * Process the file and create content from the data
 */
-std::vector<std::vector<std::string>> BankFileImporter::importFile(const std::string& fname){
-	std::vector<std::vector<std::string>> content;
+ContentVec BankFileImporter::importFile(const std::string& fname){
+	ContentVec content;
 
 	// Open file using fstream for reading into Internal buffer
 	std::ifstream file(fname, std::ifstream::in);
@@ -202,7 +203,7 @@ void BankFileImporter::refreshRefs() {
 /*
 * Work out what bank it is and assign its name
 */
-void BankFileImporter::determineBank(const std::vector<std::vector<std::string>>& content) {
+void BankFileImporter::determineBank(const ContentVec& content) {
 	// ASSUMPTION: the way data is formatted in the csv is unique to every bank
 	if (content[0][0] == "\"Account Name:\"") // Consistent with Nationwide statements from 2024 - Present
 	{
@@ -225,7 +226,7 @@ void BankFileImporter::determineBank(const std::vector<std::vector<std::string>>
 /*
 * Process the raw fstream and assign it to rawExpenses as a series of LineValue objects
 */
-void BankFileImporter::processRawFStream(const std::vector<std::vector<std::string>>& content, const std::string& fname) {
+void BankFileImporter::processRawFStream(const ContentVec& content, const std::string& fname) {
 	// Process raw data based on Bank
 	switch (bankName)
 	{
@@ -246,12 +247,12 @@ void BankFileImporter::processRawFStream(const std::vector<std::vector<std::stri
 		// Shouldn't be in here but if a bank has been added to the enum and hasn't been added to the switch
 		// it'll tell the dev what's happening
 		throw std::runtime_error("Bank not recognised in "
-			"processRawData(const std::vector<std::vector<std::string>>& content, const std::string& fname) bankName processing switch");
+			"processRawData(const ContentVec& content, const std::string& fname) bankName processing switch");
 		break;
 	}
 }
 
-void BankFileImporter::nationwideUKProcessing(const std::vector<std::vector<std::string>>& content, const std::string& fname){
+void BankFileImporter::nationwideUKProcessing(const ContentVec& content, const std::string& fname){
 	// Currently supports current account, savings account, and ISA statements with the format current in 2024 - Present
 	// Reference variables
 	LineValue lineValue;
@@ -321,7 +322,7 @@ void BankFileImporter::nationwideUKProcessing(const std::vector<std::vector<std:
 }
 
 
-void BankFileImporter::natwestUKProcessing(const std::vector<std::vector<std::string>>& content, const std::string& fname) {
+void BankFileImporter::natwestUKProcessing(const ContentVec& content, const std::string& fname) {
 	// Currently supports current account and credit card accounts with the format current in 2024 - Present
 	// Reference variables
 	LineValue lineValue;
@@ -406,7 +407,7 @@ void BankFileImporter::natwestUKProcessing(const std::vector<std::vector<std::st
 }
 
 
-void BankFileImporter::tideUKProcessing(const std::vector<std::vector<std::string>>& content, const std::string& fname) {
+void BankFileImporter::tideUKProcessing(const ContentVec& content, const std::string& fname) {
 	// Currently supports business current account statements with the format current in 2024 - Present
 	// Reference variables
 	LineValue lineValue;
