@@ -27,8 +27,8 @@ namespace Currency
 
 	// u8 string is to help windows display it properly in a terminal
 	inline constexpr std::array enumData = {std::tuple<Currency, std::string_view, std::string_view, std::u8string_view>{GBP, "GBP", "£", u8"£"},
-											std::tuple<Currency, std::string_view, std::string_view, std::u8string_view>{GBP, "EUR", "€", u8"€"},
-											std::tuple<Currency, std::string_view, std::string_view, std::u8string_view>{GBP, "USD", "$", u8"$"}, };
+											std::tuple<Currency, std::string_view, std::string_view, std::u8string_view>{EUR, "EUR", "€", u8"€"},
+											std::tuple<Currency, std::string_view, std::string_view, std::u8string_view>{USD, "USD", "$", u8"$"}, };
 
 	static_assert(enumData.size() == static_cast<int>(maxCurrencies), "Currency enumData array size mismatch");
 }
