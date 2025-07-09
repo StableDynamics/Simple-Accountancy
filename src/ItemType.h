@@ -31,9 +31,11 @@ namespace ItemType
 		Savings,
 		Interest,
 		Shopping,
+		Transport,
 		Insurance,
 		Subscriptions,
 		Entertainment,
+		Medical,
 		maxItemTypes
 	};
 
@@ -49,9 +51,11 @@ namespace ItemType
 											std::tuple<ItemType, std::string_view>{Savings		, "Savings"},
 											std::tuple<ItemType, std::string_view>{Interest		, "Interest"},
 											std::tuple<ItemType, std::string_view>{Shopping		, "Shopping"},
+											std::tuple<ItemType, std::string_view>{Transport	, "Transportation"},
 											std::tuple<ItemType, std::string_view>{Insurance	, "Insurance"},
 											std::tuple<ItemType, std::string_view>{Subscriptions, "Subscriptions"},
-											std::tuple<ItemType, std::string_view>{Entertainment, "Entertainment"} };
+											std::tuple<ItemType, std::string_view>{Entertainment, "Entertainment"},
+											std::tuple<ItemType, std::string_view>{Medical		, "Medical"} };
 
 	static_assert(enumData.size() == static_cast<int>(maxItemTypes), "ItemTypes enumData array size mismatch");
 }
