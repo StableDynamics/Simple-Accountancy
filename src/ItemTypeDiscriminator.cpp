@@ -22,11 +22,6 @@ void determineItemType(LineValue& lineVal)
 	for (auto& item : globalDiscriminatorConfiguration.getConfigData().items())
 		itemTypeStrJSON.emplace_back(item.key()); // Pulls ItemType values in order from JSON
 
-	// TEST CODE DELETE
-	/*auto jsonConfigData = globalDiscriminatorConfiguration.getConfigData();
-	auto jsonConfigDataItem = jsonConfigData.at(itemTypeStrJSON[6]);
-	auto jsonConfigDataItemString = jsonConfigDataItem.at(2);*/
-
 	std::array<int, static_cast<int>(ItemType::maxItemTypes)> exactTypeTally{}; // Holds the tally of the itemTypes that are exact matches
 	std::array<int, static_cast<int>(ItemType::maxItemTypes)> partialTypeTally{}; // Holds the tally of the itemTypes that are partial matches
 	std::vector<std::string> subtypeStrings;
@@ -45,6 +40,8 @@ void determineItemType(LineValue& lineVal)
 			// 0 = User defined search term for description
 			// 1 = Income is Income, Expense is Expense, Income or Expense is either
 			// 2 = User defined sub-type
+
+			// Compare the searchTerm's income or expense value to the linevalue's income or expense value, or to the last IorEval in the global configuration which will be "Income or Expense"
 			if (searchTerm.at(1) == enumToString(lineVal.incomeOrExpense) || searchTerm.at(1) == globalDiscriminatorConfiguration.getIorEVal().back())
 			{
 				// Exact match

@@ -137,7 +137,11 @@ ContentVec BankFileImporter::importFile(const std::string& fname){
 
 			while (std::getline(strStream, word, ','))
 			{
-				if (word.front() == '\"' && word.back() != '\"') // If the word starts with a quote but doesn't end with one
+				if (word.empty()) // If the word is empty, emplace an empty string
+				{
+					row.emplace_back("");
+				}
+				else if (word.front() == '\"' && word.back() != '\"') // If the word starts with a quote but doesn't end with one
 				{
 					isCompound = true; // Set the flag to true
 					wordStream << word;
@@ -211,7 +215,10 @@ void BankFileImporter::determineBank(const ContentVec& content) {
 	}
 	else if (content[0][0] == "Date") // Consistent with Natwest statements from 2024 - Present
 	{
-		bankName = BankName::Natwest_UK_2024;
+		if (content[content.size() - 1][2].find("Balance") != std::string::npos)
+			bankName = BankName::Natwest_UK_CC_2024;
+		else
+			bankName = BankName::Natwest_UK_2024;
 	}
 	else if (content[0][0] == "\"Date\"") // Consistent with Tide statements from 2024 - Present
 	{
@@ -233,6 +240,7 @@ void BankFileImporter::processRawFStream(const ContentVec& content, const std::s
 	case BankName::Nationwide_UK_2024:
 		nationwideUKProcessing(content, fname);
 		break;
+	case BankName::Natwest_UK_CC_2024:
 	case BankName::Natwest_UK_2024:
 		// NatWest formats credit cards differently to current accounts in that the last entry is the balance
 		// in the account at the end of the period
@@ -335,74 +343,87 @@ void BankFileImporter::natwestUKProcessing(const ContentVec& content, const std:
 	if (content[content.size() - 1][2].find("Balance") != std::string::npos)
 		ignoreLastRow = 1; // Ignore the last row
 
-	switch (bankName)
+	// Using zero based indexing - data starts on line 1 from Natwest csvs
+	startLine = 1;
+
+	// Account name for Natwest is on line 1, element 5 with account number on line 1 element 6
+	accName << content[1][5].substr(0, content[1][5].size()) << ", " << content[1][6].substr(0, content[1][6].size());
+	accountName = accName.str();
+
+	// Loop through the content and create LineValue objects
+	// would be nice to take the column row from the csv and match it up
+	// Hardcoded values are as such:
+	// 0 - Date
+	// 1 - Transaction Type
+	// 2 - Description (occassionally has compound words with " wrapping them)
+	// 3 - Value (can be +ve or -ve)
+	// 4 - Balance
+	// 5 - Account Name
+	// 6 - Account Number
+	for (size_t i = startLine; i < content.size() - ignoreLastRow; i++)
 	{
-	case BankName::Natwest_UK_2024:
-		// Using zero based indexing - data starts on line 1 from Natwest csvs
-		startLine = 1;
+		lineValue.day = std::stoi(content[i][0].substr(0, 2));
+		lineValue.month = enumFromString<Month::Month>(content[i][0].substr(3, 3), i, fname);
+		lineValue.year = std::stoi(content[i][0].substr(7, 4));
+		lineValue.transactType = content[i][1].substr(0, content[i][1].size());
 
-		// Account name for Natwest is on line 1, element 5 with account number on line 1 element 6
-		accName << content[1][5].substr(0, content[1][5].size()) << ", " << content[1][6].substr(0, content[1][6].size());
-		accountName = accName.str();
+		// Determine if there are " or not in the description string
+		if (content[i][2][0] == '\"')
+			lineValue.description = content[i][2].substr(1, content[i][2].size() - 1);
+		else
+			lineValue.description = content[i][2].substr(0, content[i][2].size());
 
-		// Loop through the content and create LineValue objects
-		// would be nice to take the column row from the csv and match it up
-		// Hardcoded values are as such:
-		// 0 - Date
-		// 1 - Transaction Type
-		// 2 - Description (occassionally has compound words with " wrapping them)
-		// 3 - Value (can be +ve or -ve)
-		// 4 - Balance
-		// 5 - Account Name
-		// 6 - Account Number
-		for (size_t i = startLine; i < content.size() - ignoreLastRow; i++)
+		// Assign Paid in/Paid out
+		// ASSUMPTION: csv file will not have 'information only' entries with no money values
+		// ASSUMPTION: Natwest csvs wil only have GBP transactions due to the values being only numbers
+		switch (bankName)
 		{
-			lineValue.day = std::stoi(content[i][0].substr(0, 2));
-			lineValue.month = enumFromString<Month::Month>(content[i][0].substr(3, 3), i, fname);
-			lineValue.year = std::stoi(content[i][0].substr(7, 4));
-			lineValue.transactType = content[i][1].substr(0, content[i][1].size());
-
-			// Determine if there are " or not in the description string
-			if (content[i][2][0] == '\"')
-				lineValue.description = content[i][2].substr(1, content[i][2].size() - 1);
-			else
-				lineValue.description = content[i][2].substr(0, content[i][2].size());
-
-			// Assign Paid in/Paid out
-			// ASSUMPTION: csv file will not have 'information only' entries with no money values
-			// ASSUMPTION: Natwest csvs wil only have GBP transactions due to the values being only numbers
+		case BankName::Natwest_UK_2024:
 			if (content[i][3][0] != '-') // Value is +ve
 			{
 				lineValue.paidOut = 0.0;
 				lineValue.paidIn = std::stod(content[i][3].substr(0, content[i][3].size()));
-				lineValue.currency = Currency::GBP;
 				lineValue.incomeOrExpense = IncomeOrExpense::Income;
 			}
 			else // Value is -ve
 			{
 				lineValue.paidOut = std::stod(content[i][3].substr(1, content[i][3].size()));
 				lineValue.paidIn = 0.0;
-				lineValue.currency = Currency::GBP;
 				lineValue.incomeOrExpense = IncomeOrExpense::Expense;
 			}
-
-			// Is balance positive or negative?
-			if (content[i][4][0] == '-' && content[i][4] != "")
-				lineValue.balance = std::stod(content[i][4].substr(1, content[i][4].size()));
-			else if (content[i][4][0] != '-' && content[i][4] != "")
-				lineValue.balance = std::stod(content[i][4].substr(0, content[i][4].size()));
-			else
-				lineValue.balance = 0.0;
-
-			// Determine the item type
-			determineItemType(lineValue);
-
-			// Push lineValue back into the expenses vector
-			rawExpenses.push_back(lineValue);
+			break;
+		case BankName::Natwest_UK_CC_2024:
+			if (content[i][3][0] != '-') // Value is +ve
+			{
+				lineValue.paidOut = std::stod(content[i][3].substr(0, content[i][3].size()));
+				lineValue.paidIn = 0.0;
+				lineValue.incomeOrExpense = IncomeOrExpense::Expense;				
+			}
+			else // Value is -ve
+			{
+				lineValue.paidOut = 0.0;
+				lineValue.paidIn = std::stod(content[i][3].substr(1, content[i][3].size()));
+				lineValue.incomeOrExpense = IncomeOrExpense::Income;
+			}
+			break;
+		default:
+			break;
 		}
-		break;
-	default:
-		break;
+		lineValue.currency = Currency::GBP;
+
+		// Is balance positive or negative?
+		if (content[i][4][0] == '-' && content[i][4] != "")
+			lineValue.balance = std::stod(content[i][4].substr(1, content[i][4].size()));
+		else if (content[i][4][0] != '-' && content[i][4] != "")
+			lineValue.balance = std::stod(content[i][4].substr(0, content[i][4].size()));
+		else
+			lineValue.balance = 0.0;
+
+		// Determine the item type
+		determineItemType(lineValue);
+
+		// Push lineValue back into the expenses vector
+		rawExpenses.push_back(lineValue);
 	}
 }
 
@@ -504,6 +525,8 @@ void BankFileImporter::makeSureDataIsAscending() {
 	case BankName::Nationwide_UK_2024:
 		// Nationwide UK csvs are in ascending order so no need to rearrange
 		break;
+
+	case BankName::Natwest_UK_CC_2024: //ASSUMPTION: Credit cards are ordered the same
 	case BankName::Natwest_UK_2024:
 		// Natwest UK csvs are in descending order so need to rearrange
 		std::reverse(rawExpenses.begin(), rawExpenses.end());
