@@ -39,6 +39,10 @@ public:
 
 	const std::array<int, 2> getYearMonthAmounts();
 
+	const std::vector<int>& getYearsContained() const;
+
+	const std::vector<std::vector<Month::Month>>& getMonthsContained() const;
+
 	// Overloaded operators
 	MonthlyTotals& operator=(MonthlyTotals other);
 
