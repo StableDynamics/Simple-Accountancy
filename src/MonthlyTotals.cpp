@@ -78,6 +78,13 @@ const std::array<int, 2> MonthlyTotals::getYearMonthAmounts() {
 	return yearMonth;
 }
 
+const std::vector<int>& MonthlyTotals::getYearsContained() const {
+	return yearsContained;
+}
+
+const std::vector<std::vector<Month::Month>>& MonthlyTotals::getMonthsContained() const {
+	return monthsContained;
+}
 
 // Overloaded operators
 MonthlyTotals& MonthlyTotals::operator=(MonthlyTotals other) {

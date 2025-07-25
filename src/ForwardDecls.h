@@ -28,16 +28,16 @@ using ContentVec = std::vector<std::vector<std::string>>;				// Content vector f
 
 using ProcessedStatement = std::vector<std::vector<std::array<std::array<std::array<std::vector<std::reference_wrapper<const LineValue>>,
 	static_cast<int>(ItemType::maxItemTypes) + 1>, static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>,
-	static_cast<int>(Currency::maxCurrencies)>>>;						// Processed statement of LineValue objects references
+	static_cast<int>(Currency::maxCurrencies)>>>;						// Processed statement of LineValue objects references in Year, Month, Currency, Income/Expense, ItemType (end idx itemType is the total)
 
 using YrMtCrIEITTotal = std::vector<std::vector<std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
-	static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>;	// Vector of Year, Month, Currency, Income/Expense, ItemType Totals
+	static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>;	// Vector of Year, Month, Currency, Income/Expense, ItemType (end idx itemType is the total) Totals
 
 using YrMtCrIEITOcc = std::vector<std::vector<std::array<std::array<std::array<uint64_t, static_cast<int>(ItemType::maxItemTypes) + 1>,
-	static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>;	// Vector of Year, Month, Currency, Income/Expense, ItemType Occurances
+	static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>;	// Vector of Year, Month, Currency, Income/Expense, ItemType (end idx itemType is the total) Occurances
 
 using YrMtCrIEITAvg = std::vector<std::vector<std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>,
-	static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>;	// Vector of Year, Month, Currency, Income/Expense, ItemType Averages
+	static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, static_cast<int>(Currency::maxCurrencies)>>>;	// Vector of Year, Month, Currency, Income/Expense, ItemType (end idx itemType is the total) Averages
 
 using CrIEITAvg = std::array<std::array<std::array<double, static_cast<int>(ItemType::maxItemTypes) + 1>, static_cast<int>(IncomeOrExpense::maxIncomeOrExpense)>, 
 	static_cast<int>(Currency::maxCurrencies)>;																// Stores monthly averages arranged by currency, and then income or expense, 
