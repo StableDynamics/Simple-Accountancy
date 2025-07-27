@@ -26,7 +26,7 @@
  * from the period.
  * Functinality varies by OS due to needing to convert UTF8 strings
  */
-void BankStatement::printStatementSummary(int strLen) {
+void BankStatement::printStatementSummary(int strLen) const{
 	std::string printDesc = "Statement Averages Summary";
 	printPerriodStart(strLen, printDesc);
 
@@ -127,7 +127,7 @@ void BankStatement::printStatementSummary(int strLen) {
 * 1 = long strings
 * 2 = number strings
 */
-void BankStatement::printPerMonthDetails(int dispType, int strLen) {
+void BankStatement::printPerMonthDetails(int dispType, int strLen) const{
 	if (strLen > 2) throw std::runtime_error("BankStatement::printStatementSummary(int strLen) called with wrong value. "
 		"Acceptable values are 0 for 3Len strings, 1 for long strings, and 2 for number strings.");
 	if (dispType > 2) throw std::runtime_error("BankStatement::printPerMonthDetails(int dispType) called with wrong value. "

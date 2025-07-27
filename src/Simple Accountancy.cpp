@@ -6,6 +6,7 @@
 
 #include "BankStatement.h"
 #include "GlobalDiscriminatorConfiguration.h"
+#include "UserInputFunctions.h"
 
 #ifdef _WIN32
 #include "Windows_SelectFiles.h"
@@ -77,14 +78,14 @@ int main(int argc, char* argv[])
 
         // Print Summary
         bankStatementsVec[idx].printStatementSummary();
-		bankStatementsVec[idx].printPerMonthDetails();
+		//bankStatementsVec[idx].printPerMonthDetails();
         idx += 1;
     }
 
     std::cout << "Finished processing all files" << std::endl << std::endl;
 
-	std::cout << "Press enter to exit..." << std::endl;
-    std::cin.get();
+	// Allow the user to select operations to apply to the files
+    userActionBankStatements(bankStatementsVec);
 
 	return 0;
 }
