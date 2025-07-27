@@ -28,7 +28,7 @@ public:
 	AccountingPeriod(const AccountingPeriod& other) = default; // Copy constructor
 	AccountingPeriod(AccountingPeriod&& other) noexcept; // Move constructor
 
-	const std::string_view getDescriptionString_sv(int idx) const;
+	const std::string_view getDescriptionString_sv(int idx = 0) const;
 
 	// Overloaded operators
 	AccountingPeriod& operator=(AccountingPeriod other);

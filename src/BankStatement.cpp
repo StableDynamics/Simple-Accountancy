@@ -72,7 +72,7 @@ void BankStatement::calculateAvg(){
 }
 
 // Prints the header at the start of the reporting sections
-void BankStatement::printPerriodStart(int strLen, std::string printDesc) {
+void BankStatement::printPerriodStart(int strLen, std::string printDesc) const {
 	// Input determines the length of strings used in account period
 	// 0 (default) = 3Len strings
 	// 1 = long strings
@@ -80,13 +80,13 @@ void BankStatement::printPerriodStart(int strLen, std::string printDesc) {
 	if (strLen > 2) throw std::runtime_error("BankStatement::printPerriodStart(int strLen) called with wrong value. "
 		"Acceptable values are 0 for 3Len strings, 1 for long strings, and 2 for number strings.");
 
-	std::cout << "############### " << printDesc << " for " << this->getBankName() << " ###############" << std::endl;
-	std::cout << "Accounting Period: " << (this->getAccountingPeriod()).getDescriptionString_sv(strLen) << std::endl;
-	std::cout << "Account Name: " << (this->getAccountName()) << std::endl << std::endl;
+	std::cout << "########### " << printDesc << " for " << this->getBankName() << " ##########" << std::endl;
+	std::cout << "### Accounting Period: " << (this->getAccountingPeriod()).getDescriptionString_sv(strLen) << std::endl;
+	std::cout << "### Account Name: " << (this->getAccountName()) << std::endl << std::endl;
 }
 
 // Prints the header at the end of the reporting sections. strLen is to do with the displayed strig length and printDscr is a description of the summary being printed
-void BankStatement::printPerriodEnd(int strLen, std::string printDesc ) {
+void BankStatement::printPerriodEnd(int strLen, std::string printDesc ) const {
 	// Input determines the length of strings used in account period
 	// 0 (default) = 3Len strings
 	// 1 = long strings
@@ -95,6 +95,7 @@ void BankStatement::printPerriodEnd(int strLen, std::string printDesc ) {
 		"Acceptable values are 0 for 3Len strings, 1 for long strings, and 2 for number strings.");
 
 	std::cout << "#### End of " << printDesc << " for " << this->getBankName() << " ####" << std::endl;
-	std::cout << "#### Account Name: " << (this->getAccountName()) << " Accounting Period: " << (this->getAccountingPeriod()).getDescriptionString_sv(strLen) << " ####" << std::endl;
-	std::cout << "############### End of " << printDesc << " ###############" << std::endl << std::endl;
+	std::cout << "#### Account Name: " << (this->getAccountName()) << std::endl;
+	std::cout << "#### Accounting Period: " << (this->getAccountingPeriod()).getDescriptionString_sv(strLen) << std::endl;
+	std::cout << "########## End of " << printDesc << " for " << this->getBankName() << " ##########" << std::endl << std::endl;
 }
