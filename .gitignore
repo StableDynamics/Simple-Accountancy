@@ -444,4 +444,4 @@ FodyWeavers.xsd
 ItemTypeList.json
 
 #Exclude the visual studio code folder
-.vscode
+.vscode/
