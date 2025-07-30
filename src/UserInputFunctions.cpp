@@ -15,10 +15,15 @@ void selectedBSOperation(const BankStatement& bankStatement, int operationIndex)
 			bankStatement.printStatementSummary();
             break;
         case 1: // Print statement details per month - Categories Only
-            std::cout << "Details per month for " << bankStatement.getBankName() << " for period: "
+            std::cout << "Details per month (Categories Only) for " << bankStatement.getBankName() << " for period: "
                 << bankStatement.getAccountingPeriod().getDescriptionString_sv() << std::endl;
 			bankStatement.printPerMonthDetails(0); // 0 for top level categories only
             break;
+		case 2: // Print statement details per month - Categories and Sub-Categories
+            std::cout << "Details per month (Categories and Sub-Categories) for " << bankStatement.getBankName() << " for period: "
+				<< bankStatement.getAccountingPeriod().getDescriptionString_sv() << std::endl;
+            bankStatement.printPerMonthDetails(1); // 1 for categories and sub-categories
+			break;
         default:
             std::cout << "Invalid operation selected." << std::endl;
             break;
@@ -35,7 +40,8 @@ void userActionBankStatements(std::vector<BankStatement>& bankStatementsVec)
     // Acceptable User Operations in a tuple
     std::tuple<int, std::string> userOperations[] = {
         {0, "Print statement summary"},
-        {1, "Print statement details per month - Categories Only"}
+        {1, "Print statement details per month - Categories Only"},
+        {2, "Print statement details per month - Categories and Sub-Categories"}
 	};
 
     while (input != "exit" && input != "x")

@@ -1,6 +1,7 @@
 ﻿
 #include "BankStatement.h"
 
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -20,13 +21,18 @@
 #include <WinNls.h>
 #endif
 
+
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+* Public functions
+*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Prints a high level summary of the contents of the bank statement including
  * bankName, monthly total income expenses arranged in years, and the averages
  * from the period.
  * Functinality varies by OS due to needing to convert UTF8 strings
  */
-void BankStatement::printStatementSummary(int strLen) const{
+void BankStatement::printStatementSummary(int strLen) const {
 	std::string printDesc = "Statement Averages Summary";
 	printPerriodStart(strLen, printDesc);
 
@@ -121,17 +127,17 @@ void BankStatement::printStatementSummary(int strLen) const{
 * 0 = (default) top level categories only
 * 1 = top level categories, sub-categories, and individual line items
 * 2 = top level categories and individual line items
-* 
+*
 * strLen Values:
 * 0 (default) = 3Len strings
 * 1 = long strings
 * 2 = number strings
 */
-void BankStatement::printPerMonthDetails(int dispType, int strLen) const{
+void BankStatement::printPerMonthDetails(int dispType, int strLen) const {
 	if (strLen > 2) throw std::runtime_error("BankStatement::printStatementSummary(int strLen) called with wrong value. "
 		"Acceptable values are 0 for 3Len strings, 1 for long strings, and 2 for number strings.");
 	if (dispType > 2) throw std::runtime_error("BankStatement::printPerMonthDetails(int dispType) called with wrong value. "
-		"Acceptable values are 0 for 3Len strings, 1 for long strings, and 2 for number strings.");
+		"Acceptable values are 0 for Categories, 1 for Categories and Sub-Categories, and 2 for all details.");
 
 	std::string printDesc = "Statement Month by Month Summary";
 	printPerriodStart(strLen, printDesc);
@@ -147,7 +153,7 @@ void BankStatement::printPerMonthDetails(int dispType, int strLen) const{
 	std::string indent1 = "    "; // Indentation for the output
 	int width1{ 15 }; // padding size
 	int width2{ 20 }; // padding size
-	int width3{ 15 }; // padding size
+	int width3{ 25 }; // padding size
 	int width4{ 15 }; // padding size
 	size_t avgEndIdx = static_cast<size_t>(avgByType[0][0].size() - 1);
 
@@ -200,21 +206,12 @@ void BankStatement::printPerMonthDetails(int dispType, int strLen) const{
 								std::stringstream cat;
 								cat << std::get<1>(ItemType::enumData[idxItemType]) << ": ";
 								std::cout << indent1 << indent1 << indent1 << std::left << std::setw(width1) << " " << std::setw(width2) << cat.str() << std::setw(width3) << " " << std::setw(width4) << " " << currSym_sv << TWODP(itemType) << std::endl;
-								switch (dispType)
-								{
-								case 0: // Top level categories only
-									// No further processing needed, just print the category and value
-									break;
-								case 1: // Top level categories, sub-categories, and individual line items
-								case 2: // Top level categories and individual line items
-									break;
-								default:
-									// Shouldn't be in here, throw error
-									std::stringstream errMsg;
-									errMsg << "BankStatement::printPerMonthDetails(int dispType, int strLen): Unrecognised ItemType Index of " << idxItemType;
-									std::string err = errMsg.str();
-									throw std::runtime_error(err);
-								}
+
+								// Loop through sub-categories and items
+								if ((dispType == 1 || dispType == 2) && itemType > 0.0000000001)
+									printSubCategories(dispType, strLen, currSym_sv, indent1, width1, width2, width3, width4, idxYear,
+										idxMonth, idxCurrency, idxIncomeOrExpense, idxItemType);
+
 								cat.str(std::string()); cat.clear(); // Clear and reset the stringstream
 
 								idxItemType += 1; // Increment item type index
@@ -235,4 +232,93 @@ void BankStatement::printPerMonthDetails(int dispType, int strLen) const{
 		idxYear += 1; // Increment year index
 	}
 	printPerriodEnd(strLen, printDesc);
+}
+
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+* Private functions
+*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Prints out the sub-categories and the individual LineItems depending on the dispType value.
+ */
+void BankStatement::printSubCategories(int const dispType, int const strLen, std::string_view currSym_sv, std::string const indent1,
+	int const width1, int const width2, int const width3, int const width4, int const idxYear, int const idxMonth,
+	int const idxCurrency, int const idxIncomeOrExpense, int const idxItemType) const {
+	double subCatTotal{ 0.0 }; // Total for the sub-category
+	int idxSubCat{ 0 }; // Index for the sub-category
+
+	// Sub-category printing variables
+	std::string word;
+	std::string line;
+	std::vector<std::string> lines;
+
+	// Vectors to store the sub-category names and item strings
+	std::vector<std::string> subCats;
+	std::vector<std::string> items;
+
+	// Extract keys using std::transform and a lambda function
+	auto lineValueMap = getLineValuesFromDatabase(getYearsContained()[idxYear], getMonthsContained()[idxYear][idxMonth],
+		std::get<0>(Currency::enumData[idxCurrency]), std::get<0>(IncomeOrExpense::enumData[idxIncomeOrExpense]),
+		std::get<0>(ItemType::enumData[idxItemType]));
+
+	std::transform(lineValueMap.begin(), lineValueMap.end(), back_inserter(subCats),
+		[](const std::pair<std::string, LineValueRefs>& pair) { return pair.first; });
+
+	// Loop through data and print it out
+	for (auto& subCat : subCats)
+	{
+		for (auto& item : lineValueMap.find(subCat)->second)
+		{
+			switch (std::get<0>(IncomeOrExpense::enumData[idxIncomeOrExpense]))
+			{
+			case IncomeOrExpense::Income:
+				subCatTotal += item.get().paidIn; // Add the paidIn value to the sub-category total
+
+				// Do stuff with itemStream
+				break;
+			case IncomeOrExpense::Expense:
+				subCatTotal += item.get().paidOut; // Add the paidOut value to the sub-category total
+
+				// Do stuff with itemStream
+				break;
+			default:
+				break;
+			}
+		}
+		std::istringstream iss(subCat);
+		while (iss >> word) // split the sub-category into words
+		{
+			if (line.length() + word.length() + 1 > width3) // Check if adding the word exceeds the width
+			{
+				lines.push_back(line); // Store the current line
+				line = word; // Start a new line with the current word
+			}
+			else
+			{
+				if (!line.empty()) line += " "; // Add a space before the word if line is not empty
+				line += word; // Add the word to the current line
+			}
+		}
+		// Assign Line to Lines
+		if (!line.empty()) {
+			lines.push_back(line);
+			line.clear(); // Clear the line for the next sub-category
+		}
+
+		for (size_t i = 0; i < lines.size(); ++i)
+		{
+			std::cout << indent1 << indent1 << indent1
+				<< std::left << std::setw(width1) << " "
+				<< std::setw(width2) << " "
+				<< std::setw(width3) << lines[i];
+			if (i == lines.size() - 1) {
+				std::cout << std::setw(width4) << " " << currSym_sv << TWODP(subCatTotal);
+			}
+			std::cout << std::endl;
+		}
+
+		lines.clear(); // Clear the lines vector for the next sub-category
+		subCatTotal = 0.0; // Reset sub-category total for next loop
+		idxSubCat += 1; // Increment sub-category index
+	}
 }
