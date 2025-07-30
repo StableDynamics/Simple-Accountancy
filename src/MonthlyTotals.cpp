@@ -28,6 +28,9 @@ MonthlyTotals::MonthlyTotals(const std::string& fname) : BankFileImporter::BankF
 	LineValueRefs expenses = BankFileImporter::getRawExpRef();
 	processStatement(expenses);
 
+	// Process statement with database
+	processStatementDatabase(expenses);
+
 	// Check array sizes are the same
 	checkArrays(expenses);
 
@@ -49,27 +52,7 @@ MonthlyTotals::MonthlyTotals(MonthlyTotals&& other) noexcept
 }
 
 
-const ProcessedStatement MonthlyTotals::getProcessedStatement() const 
-{
-	return processedStatement;
-}
-
-const YrMtCrIEITTotal& MonthlyTotals::getMonthlyTotals() const
-{
-	return monthlyTotals;
-}
-
-const YrMtCrIEITOcc& MonthlyTotals::getMonthlyOccurances() const
-{
-	return monthlyOccurances;
-}
-
-const YrMtCrIEITAvg& MonthlyTotals::getmonthlyAvgSnglTrnsct() const
-{
-	return monthlyAvgSnglTrnsct;
-}
-
-const std::array<int, 2> MonthlyTotals::getYearMonthAmounts() {
+const std::array<int, 2> MonthlyTotals::getYearMonthAmounts() const {
 	std::array<int, 2> yearMonth = {};
 	for (auto val : monthsContained) {
 		yearMonth[0] += 1; yearMonth[1] += static_cast<int>(val.size());
@@ -78,13 +61,61 @@ const std::array<int, 2> MonthlyTotals::getYearMonthAmounts() {
 	return yearMonth;
 }
 
-const std::vector<int>& MonthlyTotals::getYearsContained() const {
-	return yearsContained;
+// Experimental Database Alternative Start
+const LineValueRefs& MonthlyTotals::getLineValuesFromDatabase(int year, Month::Month month, Currency::Currency currency, 
+	IncomeOrExpense::IncomeOrExpense incomeOrExpense, ItemType::ItemType itemType, const std::string& subType) const
+{
+	auto yearIt = statementDatabase.find(year);
+	if (yearIt != statementDatabase.end())
+	{
+		auto monthIt = yearIt->second.find(month);
+		if (monthIt != yearIt->second.end())
+		{
+			auto currencyIt = monthIt->second.find(currency);
+			if (currencyIt != monthIt->second.end())
+			{
+				auto incomeOrExpenseIt = currencyIt->second.find(incomeOrExpense);
+				if (incomeOrExpenseIt != currencyIt->second.end())
+				{
+					auto itemTypeIt = incomeOrExpenseIt->second.find(itemType);
+					if (itemTypeIt != incomeOrExpenseIt->second.end())
+					{
+						auto subTypeIt = itemTypeIt->second.find(subType);
+						return subTypeIt->second; // Return the LineValueRefs for the specified subType
+					}
+				}
+			}
+		}
+	}
+	throw std::runtime_error("LineValue not found in the database.");
 }
 
-const std::vector<std::vector<Month::Month>>& MonthlyTotals::getMonthsContained() const {
-	return monthsContained;
+/*
+* Get the LineValueRefs for a specific year, month, currency, income or expense type, and item type.
+*/
+const std::map<std::string, LineValueRefs>& MonthlyTotals::getLineValuesFromDatabase(int year, Month::Month month, 
+	Currency::Currency currency, IncomeOrExpense::IncomeOrExpense incomeOrExpense, ItemType::ItemType itemType) const {
+	auto yearIt = statementDatabase.find(year);
+	if (yearIt != statementDatabase.end())
+	{
+		auto monthIt = yearIt->second.find(month);
+		if (monthIt != yearIt->second.end())
+		{
+			auto currencyIt = monthIt->second.find(currency);
+			if (currencyIt != monthIt->second.end())
+			{
+				auto incomeOrExpenseIt = currencyIt->second.find(incomeOrExpense);
+				if (incomeOrExpenseIt != currencyIt->second.end())
+				{
+					auto itemTypeIt = incomeOrExpenseIt->second.find(itemType);
+					return itemTypeIt->second; // Return the map of subTypes and their LineValueRefs
+				}
+			}
+		}
+	}
+	throw std::runtime_error("LineValue not found in the database.");
 }
+// Experimental Database Alternative End
 
 // Overloaded operators
 MonthlyTotals& MonthlyTotals::operator=(MonthlyTotals other) {
@@ -110,6 +141,21 @@ void swap(MonthlyTotals& first, MonthlyTotals& second) {
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 * Private functions
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+* Experimental Database alternative to processStatement
+*/
+void MonthlyTotals::processStatementDatabase(const LineValueRefs expenses) {
+	// Reference indexes
+	if (expenses.empty()) return; // Check to see if expenses contains data, and if not then skip function (happens if swap is being used on a blank object)
+
+	for (auto& item : expenses)
+	{
+		statementDatabase[item.get().year][item.get().month][item.get().currency]
+			[item.get().incomeOrExpense][item.get().itemType][item.get().subType].emplace_back(item);
+	}
+}
+
 
 /*
 * Process the statement with a switch to work out if it's everything or just the references that need to be reprocessed

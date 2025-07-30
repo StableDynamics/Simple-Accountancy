@@ -29,19 +29,30 @@ public:
 	MonthlyTotals(const MonthlyTotals& other) = default; // Copy constructor
 	MonthlyTotals(MonthlyTotals&& other) noexcept; // Move constructor
 
-	const ProcessedStatement getProcessedStatement() const;
+	// Getters
+	const ProcessedStatement getProcessedStatement() const { return processedStatement; };
 
-	const YrMtCrIEITTotal& getMonthlyTotals() const;
+	const YrMtCrIEITTotal& getMonthlyTotals() const { return monthlyTotals; };
 
-	const YrMtCrIEITOcc& getMonthlyOccurances() const;
+	const YrMtCrIEITOcc& getMonthlyOccurances() const { return monthlyOccurances; };
 
-	const YrMtCrIEITAvg& getmonthlyAvgSnglTrnsct() const;
+	const YrMtCrIEITAvg& getmonthlyAvgSnglTrnsct() const { return monthlyAvgSnglTrnsct; };
 
-	const std::array<int, 2> getYearMonthAmounts();
+	const std::array<int, 2> getYearMonthAmounts() const;
 
-	const std::vector<int>& getYearsContained() const;
+	const std::vector<int>& getYearsContained() const { return yearsContained; };
 
-	const std::vector<std::vector<Month::Month>>& getMonthsContained() const;
+	const std::vector<std::vector<Month::Month>>& getMonthsContained() const { return monthsContained; };
+
+	// Experimental Database Alternative Start
+	const StatementDatabase& getStatementDatabase() const { return statementDatabase; }; // Getter for the statement database
+
+	const LineValueRefs& getLineValuesFromDatabase(int year, Month::Month month, Currency::Currency currency, IncomeOrExpense::IncomeOrExpense incomeOrExpense,
+		ItemType::ItemType itemType, const std::string& subType) const;
+
+	const std::map<std::string, LineValueRefs>& getLineValuesFromDatabase(int year, Month::Month month, Currency::Currency currency, IncomeOrExpense::IncomeOrExpense incomeOrExpense,
+		ItemType::ItemType itemType) const;
+	// Experimental Database Alternative End
 
 	// Overloaded operators
 	MonthlyTotals& operator=(MonthlyTotals other);
@@ -62,6 +73,10 @@ private:
 	YrMtCrIEITOcc monthlyOccurances = { {{{{}}}} };				// Times each type occurs
 	YrMtCrIEITAvg monthlyAvgSnglTrnsct = { {{{{}}}} };			// Average singular transaction per type
 
+	// Experimental Database Alternative Start
+	StatementDatabase statementDatabase; // Database of LineValue objects arranged by Year, Month, Currency, Income/Expense, ItemType, and then Item Sub-Type
+	void processStatementDatabase(const LineValueRefs expenses);
+	// Experimental Database Alternative End
 
 	void processStatement(const LineValueRefs expenses, int newOrRefresh = 0);
 	size_t returnTotalIndex();

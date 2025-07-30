@@ -45,5 +45,9 @@ private:
 	void printPerriodStart(int strLen = 0, std::string printDesc = "CHANGEME") const; // Prints the header at the start of the reporting sections
 	void printPerriodEnd(int strLen = 0, std::string printDesc = "CHANGEME") const; // Prints the header at the end of the reporting sections
 
+	void printSubCategories(int const dispType, int const strLen, std::string_view currSym_sv, std::string const indent1, 
+		int const width1, int const width2, int const width3, int const width4, int const idxYear, int const idxMonth,
+		int const idxCurrency, int const idxIncomeOrExpense, int const idxItemType) const; // Prints the Sub-Categories of line items in the statement
+
 };
 #endif // !defined(BANKSTATEMENT)

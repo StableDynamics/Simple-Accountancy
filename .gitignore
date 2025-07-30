@@ -442,3 +442,6 @@ FodyWeavers.xsd
 
 # Exclude the discriminator config file
 ItemTypeList.json
+
+#Exclude the visual studio code folder
+.vscode

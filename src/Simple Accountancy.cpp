@@ -78,7 +78,6 @@ int main(int argc, char* argv[])
 
         // Print Summary
         bankStatementsVec[idx].printStatementSummary();
-		//bankStatementsVec[idx].printPerMonthDetails();
         idx += 1;
     }
 

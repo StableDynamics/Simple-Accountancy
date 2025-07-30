@@ -32,7 +32,10 @@ GlobalDiscriminatorConfiguration::GlobalDiscriminatorConfiguration()
             accptdIorEVals[idx] = std::string(std::get<1>(iOrE));
             idx += 1;
         }
-        accptdIorEVals[idx] = "Income or Expense";
+        // Fix: Ensure idx does not exceed the array bounds
+        if (idx < accptdIorEVals.size()) {
+            accptdIorEVals[idx] = "Income or Expense";
+        }
     }
 }
 
