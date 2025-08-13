@@ -248,9 +248,9 @@ void BankStatement::printSubCategories(int const dispType, int const strLen, std
 	int idxSubCat{ 0 }; // Index for the sub-category
 
 	// Sub-category printing variables
-	std::string word;
-	std::string line;
-	std::vector<std::string> lines;
+	std::string scWord;
+	std::string scLine;
+	std::vector<std::string> scLines;
 
 	// Vectors to store the sub-category names and item strings
 	std::vector<std::string> subCats;
@@ -286,38 +286,38 @@ void BankStatement::printSubCategories(int const dispType, int const strLen, std
 			}
 		}
 		std::istringstream iss(subCat);
-		while (iss >> word) // split the sub-category into words
+		while (iss >> scWord) // split the sub-category into words
 		{
-			if (line.length() + word.length() + 1 > width3) // Check if adding the word exceeds the width
+			if (scLine.length() + scWord.length() + 1 > width3) // Check if adding the word exceeds the width
 			{
-				lines.push_back(line); // Store the current line
-				line = word; // Start a new line with the current word
+				scLines.push_back(scLine); // Store the current line
+				scLine = scWord; // Start a new line with the current word
 			}
 			else
 			{
-				if (!line.empty()) line += " "; // Add a space before the word if line is not empty
-				line += word; // Add the word to the current line
+				if (!scLine.empty()) scLine += " "; // Add a space before the word if line is not empty
+				scLine += scWord; // Add the word to the current line
 			}
 		}
 		// Assign Line to Lines
-		if (!line.empty()) {
-			lines.push_back(line);
-			line.clear(); // Clear the line for the next sub-category
+		if (!scLine.empty()) {
+			scLines.push_back(scLine);
+			scLine.clear(); // Clear the line for the next sub-category
 		}
 
-		for (size_t i = 0; i < lines.size(); ++i)
+		for (size_t i = 0; i < scLines.size(); ++i)
 		{
 			std::cout << indent1 << indent1 << indent1
 				<< std::left << std::setw(width1) << " "
 				<< std::setw(width2) << " "
-				<< std::setw(width3) << lines[i];
-			if (i == lines.size() - 1) {
+				<< std::setw(width3) << scLines[i];
+			if (i == scLines.size() - 1) {
 				std::cout << std::setw(width4) << " " << currSym_sv << TWODP(subCatTotal);
 			}
 			std::cout << std::endl;
 		}
 
-		lines.clear(); // Clear the lines vector for the next sub-category
+		scLines.clear(); // Clear the lines vector for the next sub-category
 		subCatTotal = 0.0; // Reset sub-category total for next loop
 		idxSubCat += 1; // Increment sub-category index
 	}
