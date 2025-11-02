@@ -15,7 +15,7 @@
 #include "ForwardDecls.h"
 
 /**
- * This class inherits from MonthlyTotals and is meant to contain more advanced 
+ * This class inherits from MonthlyTotals and is meant to contain more advanced
  * analysis funcitons and display functions
  */
 class BankStatement : public MonthlyTotals
@@ -37,15 +37,16 @@ private:
 	// 0 - (maxItemTypes - 1) = totals according to ItemType enum
 	// end = Totals
 	CrIEITAvg avgByType = { {{}} };
-	
+
 	// Stores values comparing average monthly income to expenses for each currency 
 	AvgIEbyCr avgIncVsExp = {};
 
 	void calculateAvg();
 	void printPerriodStart(int strLen = 0, std::string printDesc = "CHANGEME") const; // Prints the header at the start of the reporting sections
 	void printPerriodEnd(int strLen = 0, std::string printDesc = "CHANGEME") const; // Prints the header at the end of the reporting sections
+	std::vector<std::string> splitStrIntoStringsFromWidth(std::string const& inputStr, int const maxWidth) const; // Splits a string into multiple strings based on a maximum width
 
-	void printSubCategories(int const dispType, int const strLen, std::string_view currSym_sv, std::string const indent1, 
+	void printSubCategories(int const dispType, int const strLen, std::string_view currSym_sv, std::string const indent1,
 		int const width1, int const width2, int const width3, int const width4, int const idxYear, int const idxMonth,
 		int const idxCurrency, int const idxIncomeOrExpense, int const idxItemType) const; // Prints the Sub-Categories of line items in the statement
 

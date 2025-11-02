@@ -154,7 +154,7 @@ void BankStatement::printPerMonthDetails(int dispType, int strLen) const {
 	int width1{ 15 }; // padding size
 	int width2{ 20 }; // padding size
 	int width3{ 25 }; // padding size
-	int width4{ 15 }; // padding size
+	int width4{ 25 }; // padding size
 	size_t avgEndIdx = static_cast<size_t>(avgByType[0][0].size() - 1);
 
 	// idx values
@@ -205,7 +205,7 @@ void BankStatement::printPerMonthDetails(int dispType, int strLen) const {
 							{
 								std::stringstream cat;
 								cat << std::get<1>(ItemType::enumData[idxItemType]) << ": ";
-								std::cout << indent1 << indent1 << indent1 << std::left << std::setw(width1) << " " << std::setw(width2) << cat.str() << std::setw(width3) << " " << std::setw(width4) << " " << currSym_sv << TWODP(itemType) << std::endl;
+								std::cout << indent1 << indent1 << indent1 << std::left << std::setw(width1) << " " << std::setw(width2) << cat.str() << std::setw(width3) << " " << std::setw(width4) << " " << " | " << currSym_sv << TWODP(itemType) << std::endl;
 
 								// Loop through sub-categories and items
 								if ((dispType == 1 || dispType == 2) && itemType > 0.0000000001)
@@ -238,6 +238,68 @@ void BankStatement::printPerMonthDetails(int dispType, int strLen) const {
 * Private functions
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Prints the header at the start of the reporting sections
+void BankStatement::printPerriodStart(int strLen, std::string printDesc) const {
+	// Input determines the length of strings used in account period
+	// 0 (default) = 3Len strings
+	// 1 = long strings
+	// 2 = number strings
+	if (strLen > 2) throw std::runtime_error("BankStatement::printPerriodStart(int strLen) called with wrong value. "
+		"Acceptable values are 0 for 3Len strings, 1 for long strings, and 2 for number strings.");
+
+	std::cout << "########### " << printDesc << " for " << this->getBankName() << " ##########" << std::endl;
+	std::cout << "### Accounting Period: " << (this->getAccountingPeriod()).getDescriptionString_sv(strLen) << std::endl;
+	std::cout << "### Account Name: " << (this->getAccountName()) << std::endl << std::endl;
+}
+
+// Prints the header at the end of the reporting sections. strLen is to do with the displayed strig length and printDscr is a description of the summary being printed
+void BankStatement::printPerriodEnd(int strLen, std::string printDesc) const {
+	// Input determines the length of strings used in account period
+	// 0 (default) = 3Len strings
+	// 1 = long strings
+	// 2 = number strings
+	if (strLen > 2) throw std::runtime_error("BankStatement::printPerriodEnd(int strLen) called with wrong value. "
+		"Acceptable values are 0 for 3Len strings, 1 for long strings, and 2 for number strings.");
+
+	std::cout << "#### End of " << printDesc << " for " << this->getBankName() << " ####" << std::endl;
+	std::cout << "#### Account Name: " << (this->getAccountName()) << std::endl;
+	std::cout << "#### Accounting Period: " << (this->getAccountingPeriod()).getDescriptionString_sv(strLen) << std::endl;
+	std::cout << "########## End of " << printDesc << " for " << this->getBankName() << " ##########" << std::endl << std::endl;
+}
+
+
+/*
+*Splits a string into a vector of strings based on a maximum width
+*/
+std::vector<std::string> BankStatement::splitStrIntoStringsFromWidth(std::string const& inputStr, int const maxWidth) const {
+
+	std::string word;
+	std::string line;
+	std::vector<std::string> lines;
+	std::istringstream iss(inputStr);
+
+	while (iss >> word) // split the string into words
+	{
+		if (line.length() + word.length() + 1 > maxWidth) // Check if adding the word exceeds the width
+		{
+			lines.emplace_back(line); // Store the current line
+			line = word; // Start a new line with the current word
+		}
+		else
+		{
+			if (!line.empty()) line += " "; // Add a space before the word if line is not empty
+			line += word; // Add the word to the current line
+		}
+	}
+
+	// Assign Line to Lines
+	if (!line.empty())
+		lines.push_back(line);
+
+	return lines;
+}
+
+
 /**
  * Prints out the sub-categories and the individual LineItems depending on the dispType value.
  */
@@ -248,13 +310,12 @@ void BankStatement::printSubCategories(int const dispType, int const strLen, std
 	int idxSubCat{ 0 }; // Index for the sub-category
 
 	// Sub-category printing variables
-	std::string scWord;
-	std::string scLine;
 	std::vector<std::string> scLines;
 
 	// Vectors to store the sub-category names and item strings
 	std::vector<std::string> subCats;
-	std::vector<std::string> items;
+	double itemVal{ 0.0 };
+	std::vector<std::tuple<std::string, double>> items;
 
 	// Extract keys using std::transform and a lambda function
 	auto lineValueMap = getLineValuesFromDatabase(getYearsContained()[idxYear], getMonthsContained()[idxYear][idxMonth],
@@ -273,37 +334,25 @@ void BankStatement::printSubCategories(int const dispType, int const strLen, std
 			{
 			case IncomeOrExpense::Income:
 				subCatTotal += item.get().paidIn; // Add the paidIn value to the sub-category total
-
-				// Do stuff with itemStream
+				itemVal = item.get().paidIn;
 				break;
 			case IncomeOrExpense::Expense:
 				subCatTotal += item.get().paidOut; // Add the paidOut value to the sub-category total
-
-				// Do stuff with itemStream
+				itemVal = item.get().paidOut;
 				break;
 			default:
 				break;
 			}
-		}
-		std::istringstream iss(subCat);
-		while (iss >> scWord) // split the sub-category into words
-		{
-			if (scLine.length() + scWord.length() + 1 > width3) // Check if adding the word exceeds the width
+
+			// Collect the item strings if needed
+			if (dispType == 2)
 			{
-				scLines.push_back(scLine); // Store the current line
-				scLine = scWord; // Start a new line with the current word
+				items.emplace_back(std::tuple<std::string, double>(item.get().description, itemVal));
 			}
-			else
-			{
-				if (!scLine.empty()) scLine += " "; // Add a space before the word if line is not empty
-				scLine += scWord; // Add the word to the current line
-			}
+
 		}
-		// Assign Line to Lines
-		if (!scLine.empty()) {
-			scLines.push_back(scLine);
-			scLine.clear(); // Clear the line for the next sub-category
-		}
+
+		scLines = splitStrIntoStringsFromWidth(subCat, width3);
 
 		for (size_t i = 0; i < scLines.size(); ++i)
 		{
@@ -312,12 +361,34 @@ void BankStatement::printSubCategories(int const dispType, int const strLen, std
 				<< std::setw(width2) << " "
 				<< std::setw(width3) << scLines[i];
 			if (i == scLines.size() - 1) {
-				std::cout << std::setw(width4) << " " << currSym_sv << TWODP(subCatTotal);
+				std::cout << std::setw(width4) << " " << " | " << currSym_sv << TWODP(subCatTotal);
 			}
 			std::cout << std::endl;
 		}
 
+		if (dispType == 2) // Display the individual line items
+		{
+			std::vector<std::string> itemLines;
+			for (auto& item : items)
+			{
+				itemLines = splitStrIntoStringsFromWidth(std::get<0>(item), width4);
+				for (size_t i = 0; i < itemLines.size(); ++i)
+				{
+					std::cout << indent1 << indent1 << indent1
+						<< std::left << std::setw(width1) << " "
+						<< std::setw(width2) << " "
+						<< std::setw(width3) << " "
+						<< std::setw(width4) << itemLines[i];
+					if (i == itemLines.size() - 1) {
+						std::cout << " | " << currSym_sv << TWODP(std::get<1>(item));
+					}
+					std::cout << std::endl;
+				}
+			}
+		}
+
 		scLines.clear(); // Clear the lines vector for the next sub-category
+		items.clear(); // Clear the items vector for the next sub-category
 		subCatTotal = 0.0; // Reset sub-category total for next loop
 		idxSubCat += 1; // Increment sub-category index
 	}

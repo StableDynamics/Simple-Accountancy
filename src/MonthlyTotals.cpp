@@ -19,7 +19,7 @@
 * Public functions
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-MonthlyTotals::MonthlyTotals(){
+MonthlyTotals::MonthlyTotals() {
 }
 
 
@@ -38,7 +38,7 @@ MonthlyTotals::MonthlyTotals(const std::string& fname) : BankFileImporter::BankF
 	calculateAverages();
 }
 
-MonthlyTotals::~MonthlyTotals(){
+MonthlyTotals::~MonthlyTotals() {
 
 }
 
@@ -57,12 +57,15 @@ const std::array<int, 2> MonthlyTotals::getYearMonthAmounts() const {
 	for (auto val : monthsContained) {
 		yearMonth[0] += 1; yearMonth[1] += static_cast<int>(val.size());
 	}
-	
+
 	return yearMonth;
 }
 
 // Experimental Database Alternative Start
-const LineValueRefs& MonthlyTotals::getLineValuesFromDatabase(int year, Month::Month month, Currency::Currency currency, 
+/*
+* Get LineValueRefs for a specific year, month, currency, income/expense type, item type, and sub-type.
+*/
+const LineValueRefs& MonthlyTotals::getLineValuesFromDatabase(int year, Month::Month month, Currency::Currency currency,
 	IncomeOrExpense::IncomeOrExpense incomeOrExpense, ItemType::ItemType itemType, const std::string& subType) const
 {
 	auto yearIt = statementDatabase.find(year);
@@ -93,7 +96,7 @@ const LineValueRefs& MonthlyTotals::getLineValuesFromDatabase(int year, Month::M
 /*
 * Get the LineValueRefs for a specific year, month, currency, income or expense type, and item type.
 */
-const std::map<std::string, LineValueRefs>& MonthlyTotals::getLineValuesFromDatabase(int year, Month::Month month, 
+const std::map<std::string, LineValueRefs>& MonthlyTotals::getLineValuesFromDatabase(int year, Month::Month month,
 	Currency::Currency currency, IncomeOrExpense::IncomeOrExpense incomeOrExpense, ItemType::ItemType itemType) const {
 	auto yearIt = statementDatabase.find(year);
 	if (yearIt != statementDatabase.end())
@@ -166,10 +169,10 @@ void MonthlyTotals::processStatement(const LineValueRefs expenses, int newOrRefr
 	// Function changes based on input newOrRefresh
 	// 0 (default value) = new object things need to be assigned from scratch
 	// 1 = move/copy of object and reference arrays need to be updated
-	
+
 	// Reference indexes
 	if (expenses.empty()) return; // Check to see if expenses contains data, and if not then skip function (happens if swap is being used on a blank object)
-	
+
 	size_t yearIdx{ 0 };
 	size_t monthIdx{ 0 };
 
@@ -184,7 +187,7 @@ void MonthlyTotals::processStatement(const LineValueRefs expenses, int newOrRefr
 	// Assign values from first entry
 	std::vector<int> years = { expenses[0].get().year };
 	std::vector<std::vector<Month::Month>> months = { {expenses[0].get().month} };
-	
+
 
 	// Setup depending on newOrRefresh
 	if (newOrRefresh == 0) {
@@ -269,7 +272,7 @@ void MonthlyTotals::processStatement(const LineValueRefs expenses, int newOrRefr
 		// Shouldn't get in here
 		break;
 	}
-	
+
 	return;
 }
 
@@ -293,13 +296,13 @@ void MonthlyTotals::determineItemType(const LineValue& expense, const size_t mon
 	// Function changes based on input newOrRefresh
 	// 0 (default value) = new object things need to be assigned from scratch
 	// 1 = move/copy of object and reference arrays need to be updated
-	
+
 	// Pull out indexes
 	size_t currencyIdx = static_cast<size_t>(expense.currency);
 	size_t iOrEIdx = static_cast<size_t>(expense.incomeOrExpense);
 	size_t itemTypeIdx = static_cast<size_t>(expense.itemType);
 	size_t totalIdx = returnTotalIndex();
-	
+
 	// Determine income vs expense
 	// CONVENTION: all values should be positive
 	switch (newOrRefresh)
@@ -342,7 +345,7 @@ void MonthlyTotals::determineItemType(const LineValue& expense, const size_t mon
 	default:
 		break;
 	}
-	
+
 	// Setup references to original object
 	processedStatement[yearIdx][monthIdx][currencyIdx][iOrEIdx][totalIdx].push_back(expense);
 	processedStatement[yearIdx][monthIdx][currencyIdx][iOrEIdx][itemTypeIdx].push_back(expense);
@@ -380,15 +383,15 @@ void MonthlyTotals::checkArrays(const LineValueRefs expenses) {
 /*
 * Calculate the average values for Income and Expenses by ItemType per month per year
 */
-void MonthlyTotals::calculateAverages(){
+void MonthlyTotals::calculateAverages() {
 	// Loop through the arrays and calculate the average monetary value per type
 	for (size_t i = 0; i < yearsContained.size(); i++)
 		for (size_t j = 0; j < monthsContained[i].size(); j++)
 			for (size_t k = 0; k < static_cast<size_t>(Currency::maxCurrencies); k++)
 				for (size_t l = 0; l < static_cast<size_t>(IncomeOrExpense::maxIncomeOrExpense); l++)
 					for (size_t m = 0; m < static_cast<size_t>(ItemType::maxItemTypes) + 1; m++)
-						monthlyAvgSnglTrnsct[i][j][k][l][m] = (monthlyOccurances[i][j][k][l][m] == 0) ? 0.0 : 
-							monthlyTotals[i][j][k][l][m] / monthlyOccurances[i][j][k][l][m];
+						monthlyAvgSnglTrnsct[i][j][k][l][m] = (monthlyOccurances[i][j][k][l][m] == 0) ? 0.0 :
+						monthlyTotals[i][j][k][l][m] / monthlyOccurances[i][j][k][l][m];
 }
 
 
