@@ -38,6 +38,9 @@ private:
 	// end = Totals
 	CrIEITAvg avgByType = { {{}} };
 
+	// Total by type is the same data type as average, so it is reused here
+	CrIEITAvg ttlByType = { {{}} };
+	
 	// Stores values comparing average monthly income to expenses for each currency 
 	AvgIEbyCr avgIncVsExp = {};
 

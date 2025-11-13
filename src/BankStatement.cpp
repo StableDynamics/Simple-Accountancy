@@ -55,6 +55,9 @@ void BankStatement::calculateAvg() {
 					}
 				}
 		}
+	
+	// The avgByType at this point is still the total, so we can assign the total at this stage
+	ttlByType = avgByType;
 
 	// Calculate Averages
 	for (auto& currency : avgByType)
