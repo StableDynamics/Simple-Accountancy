@@ -1,4 +1,5 @@
-﻿#include "BankStatement.h"
+﻿
+#include "BankStatement.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -48,31 +49,27 @@ void BankStatement::printStatementSummary(int strLen) const {
 	//std::locale::global(std::locale("en_GB.UTF-8")); // Set locale globally to UTF-8, this might be needed for portability
 #endif
 
-	// Local copy of Total & Average by Type for easier access
-	auto& currencyTtl = ttlByType;
-	auto& currencyAvg = avgByType;
-
-    for (size_t x = 0; x < currencyAvg.size(); x++)
+	for (auto& currency : avgByType)
 	{
-		if (!(currencyAvg[x][0][avgEndIdx] <= 0.00001 && currencyAvg[x][0][avgEndIdx] >= -0.00001) || !(currencyAvg[x][1][avgEndIdx] <= 0.00001 && currencyAvg[x][1][avgEndIdx] >= -0.00001)) // Making sure there is an income/expense per currency
+		if (!(currency[0][avgEndIdx] <= 0.00001 && currency[0][avgEndIdx] >= -0.00001) || !(currency[1][avgEndIdx] <= 0.00001 && currency[1][avgEndIdx] >= -0.00001)) // Making sure there is an income/expense per currency by checking the total value at the end of the array
 		{
 			std::string currSym = enumToString(static_cast<Currency::Currency>(currIdx), "Other");
 			std::string_view currSym_sv = currSym; // Saves a lot of copying
 			std::cout << "##### " << enumToString(static_cast<Currency::Currency>(currIdx), "3Len") << " / " << currSym_sv << " #####" << std::endl << std::endl;
 			std::stringstream tableHeader;
 			tableHeader <<
-				std::left << "|" << std::setw(width1) << "Type" << "|" << std::setw(width2) << "Average Value over Period" << "|" << std::setw(width2) << "Total Value over Period" << "|" << std::endl <<
-				"|" << std::setw(width1) << std::string(width1, '-') << "|" << std::setw(width2) << std::string(width2, '-') << "|" << std::setw(width2) << std::string(width2, '-') << "|" << std::endl;
-			for (size_t i = 0; i < currencyAvg[x].size(); i++)
+				std::left << "|" << std::setw(width1) << "Type" << "|" << std::setw(width2) << "Average Value over Period" << "|" << std::endl <<
+				"|" << std::setw(width1) << std::string(width1, '-') << "|" << std::setw(width2) << std::string(width2, '-') << "|" << std::endl;
+			for (size_t i = 0; i < currency.size(); i++)
 			{
 				switch (static_cast<IncomeOrExpense::IncomeOrExpense>(i))
 				{
 				case IncomeOrExpense::Income:
-					std::cout << "AVERAGE & TOTAL INCOME PER MONTH OVER PERIOD" << std::endl << std::endl;
+					std::cout << "AVERAGE INCOME PER MONTH OVER PERIOD" << std::endl << std::endl;
 					std::cout << tableHeader.str();
 					break;
 				case IncomeOrExpense::Expense:
-					std::cout << "AVERAGE & TOTAL EXPENSE PER MONTH OVER PERIOD" << std::endl << std::endl;
+					std::cout << "AVERAGE EXPENSE PER MONTH OVER PERIOD" << std::endl << std::endl;
 					std::cout << tableHeader.str();
 					break;
 				default:
@@ -84,34 +81,28 @@ void BankStatement::printStatementSummary(int strLen) const {
 					break;
 				}
 
-				std::stringstream valAvg;
-				std::stringstream valTtl;
+				std::stringstream val;
 				size_t j{ 0 };
 #ifdef _WIN32
 				width2 += 1; // Windows weirdness due to UTF8 shenanigans
 #endif // _WIN32
 				while (j < static_cast<size_t>(ItemType::maxItemTypes))
 				{
-					valAvg << currSym_sv << TWODP(currencyAvg[x][i][j]);
-					valTtl << currSym_sv << TWODP(currencyTtl[x][i][j]);
+					val << currSym_sv << TWODP(currency[i][j]);
 					std::cout <<
-						std::left << "|" << std::setw(width1) << enumToString(static_cast<ItemType::ItemType>(j), "Other") << "|" << std::right << std::setw(width2) << valAvg.str() << "|" 
-							<< std::setw(width2) << valTtl.str() << "|" <<  std::endl;
-					// Clear variables
-					valAvg.str(std::string()); valAvg.clear();
-					valTtl.str(std::string()); valTtl.clear();
+						std::left << "|" << std::setw(width1) << enumToString(static_cast<ItemType::ItemType>(j), "Other") << "|" << std::right << std::setw(width2) << val.str() << "|" << std::endl;
+					val.str(std::string()); val.clear(); // Clear and reset it
 					j++;
 				}
-				valAvg << currSym_sv << TWODP(currencyAvg[x][i][j]);
-				valTtl << currSym_sv << TWODP(currencyTtl[x][i][j]);
+				val << currSym_sv << TWODP(currency[i][j]);
 				std::cout <<
-					std::left << "|" << std::setw(width1) << "Total" << "|" << std::right << std::setw(width2) << valAvg.str() << "|" << std::setw(width2) << valTtl.str() << "|" << std::endl << std::endl;
+					std::left << "|" << std::setw(width1) << "Total" << "|" << std::right << std::setw(width2) << val.str() << "|" << std::endl << std::endl;
 #ifdef _WIN32
 				width2 -= 1; // Windows weirdness due to UTF8 shenanigans
 #endif // _WIN32
 			}
-			// Income vs Expenditure - the average net balance per month
-			std::cout << "Average Monthly Net Balance: ";
+			// Income vs Expenditure
+			std::cout << "Average Monthly Income vs Expenditure: ";
 			if (avgIncVsExp[currIdx] < 0.0)
 			{
 				std::stringstream tot;
