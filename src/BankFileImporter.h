@@ -52,6 +52,7 @@ private:
 	void determineBank(const ContentVec& content);
 	void nationwideUKProcessing(const ContentVec& content, const std::string& fname);
 	void natwestUKProcessing(const ContentVec& content, const std::string& fname);
+	void HalifxUKProcessing(const ContentVec& content, const std::string& fname);
 	void tideUKProcessing(const ContentVec& content, const std::string& fname);
 	void makeSureDataIsAscending();
 	virtual void refreshRefs();

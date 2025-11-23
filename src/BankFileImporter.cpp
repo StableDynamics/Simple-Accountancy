@@ -224,6 +224,10 @@ void BankFileImporter::determineBank(const ContentVec& content) {
 	{
 		bankName = BankName::Tide_UK_2024;
 	}
+	else if (content[0][0] == "Transaction Date") // Consistent with Halifax statements from 2025 - Present
+	{
+		bankName = BankName::Halifax_UK_2025;
+	}
 	else
 	{
 		throw std::runtime_error("Bank not recognised in BankStatement::BankStatement(std::string& fname) BankName member variable assignment");
@@ -246,7 +250,9 @@ void BankFileImporter::processRawFStream(const ContentVec& content, const std::s
 		// in the account at the end of the period
 		natwestUKProcessing(content, fname);
 		break;
-	case BankName::Halifax_UK:
+	case BankName::Halifax_UK_2025:
+		HalifxUKProcessing(content, fname);
+		break;
 		break;
 	case BankName::Tide_UK_2024:
 		tideUKProcessing(content, fname);
@@ -427,6 +433,84 @@ void BankFileImporter::natwestUKProcessing(const ContentVec& content, const std:
 	}
 }
 
+void BankFileImporter:: HalifxUKProcessing(const ContentVec& content, const std::string& fname) {
+	// Currently supports current account and credit card accounts with the format current in 2024 - Present
+	// Reference variables
+	LineValue lineValue;
+	size_t startLine{};
+	std::stringstream accName;
+
+	// Credit card statements have an additional row at the end that contains the balance, work out if it is present 
+	// and if it needs to be ignored
+	int ignoreLastRow{ 0 };
+	if (content[content.size() - 1][2].find("Balance") != std::string::npos)
+		ignoreLastRow = 1; // Ignore the last row
+
+	// Using zero based indexing - data starts on line 1 from Natwest csvs
+	startLine = 1;
+
+	// Account name for Natwest is on line 1, element 5 with account number on line 1 element 6
+	accName << "Unknown" << ", " << content[1][3].substr(0, content[1][3].size());
+	accountName = accName.str();
+
+	// Loop through the content and create LineValue objects
+	// would be nice to take the column row from the csv and match it up
+	// Hardcoded values are as such:
+	// 0 - Date
+	// 1 - Transaction Type
+	// 2 - Description (occassionally has compound words with " wrapping them)
+	// 3 - Value (can be +ve or -ve)
+	// 4 - Balance
+	// 5 - Account Name
+	// 6 - Account Number
+	for (size_t i = startLine; i < content.size() - ignoreLastRow; i++)
+	{
+		lineValue.day = std::stoi(content[i][0].substr(0, 2));
+		lineValue.month = static_cast<Month::Month>(std::stoi(content[i][0].substr(3, 2)));
+		lineValue.year = std::stoi(content[i][0].substr(7, 4));
+		lineValue.transactType = content[i][1];
+		lineValue.description = content[i][4];
+
+		// Assign Paid in/Paid out
+		// ASSUMPTION: csv file will not have 'information only' entries with no money values
+		// ASSUMPTION: Natwest csvs wil only have GBP transactions due to the values being only numbers
+		switch (bankName)
+		{
+		case BankName::Halifax_UK_2025:
+			if (content[i][5].empty()) // Value is +ve
+			{
+				lineValue.paidOut = 0.0;
+				lineValue.paidIn = std::stod(content[i][6]);
+				lineValue.incomeOrExpense = IncomeOrExpense::Income;
+			}
+			else // Value is -ve
+			{
+				lineValue.paidOut = std::stod(content[i][5]);
+				lineValue.paidIn = 0.0;
+				lineValue.incomeOrExpense = IncomeOrExpense::Expense;
+			}
+			break;
+		
+		default:
+			break;
+		}
+		lineValue.currency = Currency::GBP;
+
+		// Is balance positive or negative?
+		if (content[i][7][0] == '-' && content[i][7] != "")
+			lineValue.balance = std::stod(content[i][7].substr(1, content[i][7].size()));
+		else if (content[i][7][0] != '-' && content[i][7] != "")
+			lineValue.balance = std::stod(content[i][7].substr(0, content[i][7].size()));
+		else
+			lineValue.balance = 0.0;
+
+		// Determine the item type
+		determineItemType(lineValue);
+
+		// Push lineValue back into the expenses vector
+		rawExpenses.push_back(lineValue);
+	}
+}
 
 void BankFileImporter::tideUKProcessing(const ContentVec& content, const std::string& fname) {
 	// Currently supports business current account statements with the format current in 2024 - Present
@@ -531,7 +615,7 @@ void BankFileImporter::makeSureDataIsAscending() {
 		// Natwest UK csvs are in descending order so need to rearrange
 		std::reverse(rawExpenses.begin(), rawExpenses.end());
 		break;
-	case BankName::Halifax_UK:
+	case BankName::Halifax_UK_2025:
 		// Currently unknown
 		break;
 	case BankName::Tide_UK_2024:
