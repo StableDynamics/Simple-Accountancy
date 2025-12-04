@@ -5,6 +5,7 @@
 //  Original author: matth
 ///////////////////////////////////////////////////////////
 
+
 #include "AccountingPeriod.h"
 
 #include <sstream>
