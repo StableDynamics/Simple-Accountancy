@@ -73,6 +73,13 @@ int main(int argc, char* argv[])
         catch (const std::exception& e)
         {
             std::cerr << e.what() << std::endl;
+
+            // "Press any key to continue..."
+#ifdef _WIN32
+            system("pause");
+#else
+            system("read");
+#endif
             return -1;
         }
 

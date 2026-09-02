@@ -20,6 +20,7 @@ namespace BankName
 	enum BankName
 	{
 		Nationwide_UK_2024,
+		Nationwide_UK_2026, // Encoding change
 		Natwest_UK_2024,
 		Natwest_UK_CC_2024, // NatWest Credit Card
 		Halifax_UK,
@@ -28,6 +29,7 @@ namespace BankName
 	};
 
 	inline constexpr std::array enumData = {std::tuple<BankName, std::string_view>{Nationwide_UK_2024	, "Nationwide UK"},
+											std::tuple<BankName, std::string_view>{Nationwide_UK_2026	, "Nationwide UK"},
 											std::tuple<BankName, std::string_view>{Natwest_UK_2024		, "NatWest UK"},
 											std::tuple<BankName, std::string_view>{Natwest_UK_CC_2024	, "NatWest UK"},
 											std::tuple<BankName, std::string_view>{Halifax_UK			, "Halifax UK"},
